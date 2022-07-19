@@ -1,0 +1,120 @@
+import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpStatus, Patch, Body, Param, ParseIntPipe, Post } from '@nestjs/common'
+import { Request, Response } from 'express'
+import { AuthGuard } from '@nestjs/passport'
+import { UserService } from './user.service'
+import { RolesGuard } from 'src/guards/roles.guard'
+import { UpdateMeDto } from './dto/update-me.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { Roles } from 'src/decorators/roles.decorator'
+import { CONSTANTS } from '../common/constants'
+
+@Controller('users')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+export class UserController {
+  constructor(private readonly userService: UserService) { }
+
+  @Get('me')
+  @UsePipes(new ValidationPipe())
+  async getMe(@Req() request: Request, @Res() response: Response) {
+    try {
+      const user = await this.userService.findOne({ where: { id: request['user']['id'] } })
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        user,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Patch('me')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true }))
+  async updateMe(@Req() request: Request, @Res() response: Response, @Body() updateMeDto: UpdateMeDto) {
+    try {
+      const user = await this.userService.updateOne(request['user']['id'], updateMeDto)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        user,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Patch(':userId')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true }))
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  async update(@Req() request: Request, @Res() response: Response, @Body() updateUserDto: UpdateUserDto) {
+    try {
+      const user = await this.userService.updateOne(request['user']['id'], updateUserDto)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        user,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get('forms')
+  @UsePipes(new ValidationPipe())
+  @Roles(CONSTANTS.ROLES.SUBADMIN)
+  async getUnreadFormNotifications(@Res() response: Response) {
+    try {
+      const notifications = await this.userService.getUnreadFormNotifications()
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        notifications,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get(':userId/forms')
+  @UsePipes(new ValidationPipe())
+  @Roles(CONSTANTS.ROLES.SUBADMIN)
+  async getFormDetails(@Param('userId', ParseIntPipe) userId: number, @Res() response: Response) {
+    try {
+      const details = await this.userService.getFormDetails(userId)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        details,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get(':userid/check-confirm-status')
+  @UsePipes(new ValidationPipe())
+  async checkConfirmStatus(@Req() request: Request, @Res() response: Response) {
+    try {
+      const status = await this.userService.checkConfirmStatus(request['user']['id'])
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        status: Boolean(status),
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+}
