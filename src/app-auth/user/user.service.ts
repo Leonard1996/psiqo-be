@@ -20,12 +20,18 @@ export class UserService {
   async findOneBy(fieldValue: { [key: string]: string }): Promise<User | undefined> {
     const field = Object.keys(fieldValue)[0]
     const value = Object.values(fieldValue)[0]
-    return this.usersRepository.createQueryBuilder('user').addSelect('user.password').where(`${field} = :field`, { field: value }).getOne()
+    return this.usersRepository
+      .createQueryBuilder('users')
+      .addSelect('users.password')
+      .leftJoinAndSelect('users.therapist', 'therapist')
+      .leftJoinAndSelect('users.patient', 'patient')
+      .where(`${field} = :field`, { field: value })
+      .getOne()
   }
 
   async register(registerDto: RegisterDto): Promise<User> {
     const password = crypto.createHash('sha256').update(registerDto.password).digest('hex')
-    const isSingle = registerDto.isSingle === 'true' ? true : false;
+    const isSingle = registerDto.isSingle === 'true' ? true : false
     const user = this.usersRepository.create({ ...registerDto, password, isSingle })
     return this.usersRepository.save(user)
   }
@@ -75,13 +81,14 @@ export class UserService {
   }
 
   checkConfirmStatus(id: number) {
-    return this.usersRepository.createQueryBuilder('u')
+    return this.usersRepository
+      .createQueryBuilder('u')
       .innerJoin('patientsDoctors', 'pd', 'pd.patientId = u.id')
       .innerJoin('sessions', 's', 's.patientDoctorId = pd.id')
       .where('u.id = :id', { id })
       .andWhere('s.isConfirmed = :isConfirmed', { isConfirmed: false })
       .andWhere('u.credit > :credit', { credit: 0 })
-      .getCount();
+      .getCount()
   }
 
   registerTherapist(registerTherapistDto: RegisterTherapistDto) {

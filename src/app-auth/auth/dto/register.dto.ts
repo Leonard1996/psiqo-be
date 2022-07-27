@@ -28,4 +28,6 @@ export class RegisterDto {
   form: string
 
   isSingle?: string
+
+  role?:string
 }

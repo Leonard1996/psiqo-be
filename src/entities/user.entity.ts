@@ -3,6 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, Index, OneToMany,
 import { BasicEntity } from './basic.entity'
 import { PatientDoctor } from './patient.doctor.entity'
 import { Therapist } from './therapist.entity'
+import { Patient } from './patient.entity'
 
 @Entity('users')
 export class User extends BasicEntity {
@@ -56,7 +57,10 @@ export class User extends BasicEntity {
   doctors: PatientDoctor[]
 
   @OneToOne(() => Therapist, (therapist) => therapist.user)
-  therapists: Therapist
+  therapist: Therapist
+
+  @OneToOne(() => Patient, (patient) => patient.user)
+  patient: Patient
 
   @BeforeInsert()
   generateVerificationCode() {

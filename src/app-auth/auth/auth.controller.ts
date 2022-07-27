@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import global from 'src/global/file-config'
 import * as crypto from 'crypto'
 import { UserService } from '../user/user.service'
+import { ROLES } from '../common/constants'
 
 @Controller()
 export class AuthController {
@@ -35,6 +36,7 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   async register(@Body() registerDto: RegisterDto, @Res() response: Response) {
     try {
+      registerDto.role = ROLES.PATIENT
       await this.authService.register(registerDto)
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
@@ -67,7 +69,8 @@ export class AuthController {
   async registerTherapist(@Req() request: Request, @Res() response: Response, @UploadedFile() cv: Express.Multer.File) {
     try {
       const registerDto = {
-        ...request.body
+        ...request.body,
+        role:ROLES.DOCTOR
       }
       const { id } = await this.authService.register(registerDto, true)
       await this.userService.registerTherapist({ userId: id, details: request.body, cv: cv.path })

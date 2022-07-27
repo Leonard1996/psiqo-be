@@ -1,18 +1,17 @@
 import { Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { getConnectionOptions } from 'typeorm'
+import { ConfigModule } from '@nestjs/config'
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { AppAuthModule } from './app-auth/app-auth.module'
 import { AppCoreModule } from './app-core/app-core.module'
 import { MailModule } from './app-core/mail/mail.module'
 import { AppController } from './app.controller'
+import { ormconfiguration } from './ormconfig'
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: async () =>
-        Object.assign(await getConnectionOptions(), {
-          autoLoadEntities: true,
-        }),
+    TypeOrmModule.forRoot(ormconfiguration as TypeOrmModuleOptions),
+    ConfigModule.forRoot({
+      isGlobal: true, // no need to import into other modules
     }),
     AppAuthModule,
     MailModule,

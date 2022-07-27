@@ -16,7 +16,7 @@ export class Therapist extends BasicEntity {
     @Column({ type: "json" })
     details: string
 
-    @OneToOne(() => User, (user) => user.therapists)
+    @OneToOne(() => User, (user) => user.therapist)
     @JoinColumn()
     user: User
 }

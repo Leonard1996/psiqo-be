@@ -55,7 +55,7 @@ export class AuthService {
     }
     const user = await this.userService.register(registerDto)
     !skipVerification && this.mailService.sendUserValidation(user)
-    return user;
+    return user
   }
 
   validate(verificationDto: VerificationDto) {
