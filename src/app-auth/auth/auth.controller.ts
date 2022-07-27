@@ -12,7 +12,7 @@ import { ROLES } from '../common/constants'
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly userService: UserService) { }
+  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
   @Post('/login')
   @UsePipes(new ValidationPipe())
@@ -70,9 +70,11 @@ export class AuthController {
     try {
       const registerDto = {
         ...request.body,
-        role:ROLES.DOCTOR
+        role: ROLES.DOCTOR,
       }
       const { id } = await this.authService.register(registerDto, true)
+      delete request.body.password
+      delete request.body.confirmPassword
       await this.userService.registerTherapist({ userId: id, details: request.body, cv: cv.path })
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
@@ -85,4 +87,3 @@ export class AuthController {
     }
   }
 }
-
