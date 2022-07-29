@@ -4,4 +4,6 @@ export class UpdateUserDto {
   @Allow()
   isActive: boolean
   password?: string
+  details?: string
+  newsletter?: boolean
 }

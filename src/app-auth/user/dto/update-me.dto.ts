@@ -15,4 +15,8 @@ export class UpdateMeDto {
   lastName: string
   @Allow()
   name: string
+  @Allow()
+  details: string
+  @Allow()
+  newsletter: boolean
 }

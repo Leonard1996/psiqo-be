@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from '../../entities/user.entity'
 import { RegisterDto } from '../auth/dto/register.dto'
@@ -8,6 +8,7 @@ import { UpdateMeDto } from './dto/update-me.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { RegisterTherapistDto } from '../auth/dto/register-therapist.dto'
 import { Therapist } from 'src/entities/therapist.entity'
+import { Patient } from 'src/entities/patient.entity'
 const crypto = require('crypto')
 
 @Injectable()
@@ -16,6 +17,8 @@ export class UserService {
   private usersRepository: Repository<User>
   @InjectRepository(Therapist)
   private therapistRepository: Repository<Therapist>
+  @InjectRepository(Patient)
+  private patientRepository: Repository<Patient>
 
   async findOneBy(fieldValue: { [key: string]: string }): Promise<User | undefined> {
     const field = Object.keys(fieldValue)[0]
@@ -50,15 +53,21 @@ export class UserService {
   }
 
   findOne(whereCondition: any) {
+    console.log({ whereCondition })
     return this.usersRepository.findOneOrFail(whereCondition)
   }
 
   async updateOne(id: number, updateMeDto: UpdateMeDto | UpdateUserDto) {
-    const existingUser = await this.usersRepository.findOneOrFail({ where: { id } })
+    const existingUser = await this.usersRepository.findOneOrFail({ where: { id }, relations: ['patient'] })
     if (updateMeDto.hasOwnProperty('password')) {
       updateMeDto.password = crypto.createHash('sha256').update(updateMeDto.password).digest('hex')
     }
+    const patient = { ...existingUser.patient, details: updateMeDto.details, newsletter: updateMeDto.newsletter }
     const user = this.usersRepository.merge(existingUser, updateMeDto)
+    if (updateMeDto.details && updateMeDto.newsletter !== undefined) {
+      await this.patientRepository.save(patient)
+      user.patient = patient
+    }
     return this.usersRepository.save(user)
   }
 

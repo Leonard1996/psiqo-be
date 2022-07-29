@@ -8,11 +8,11 @@ import { User } from 'src/entities/user.entity'
 import { SessionCreatedEventService } from './session.created.event.service'
 import { PatientDoctorService } from '../patient-doctor/patient.doctor.service'
 import { Therapist } from 'src/entities/therapist.entity'
-
+import { Patient } from 'src/entities/patient.entity'
 
 @Module({
-    imports: [UsersModule, TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist])],
-    providers: [PatientDoctorService, UserService, SessionCreatedEventService],
-    exports: [PatientDoctorService, SessionCreatedEventService],
+  imports: [UsersModule, TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient])],
+  providers: [PatientDoctorService, UserService, SessionCreatedEventService],
+  exports: [PatientDoctorService, SessionCreatedEventService],
 })
-export class SessionModule { }
+export class SessionModule {}

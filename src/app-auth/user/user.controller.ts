@@ -1,4 +1,4 @@
-import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpStatus, Patch, Body, Param, ParseIntPipe, Post } from '@nestjs/common'
+import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpStatus, Patch, Body, Param, ParseIntPipe } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { UserService } from './user.service'
@@ -7,17 +7,18 @@ import { UpdateMeDto } from './dto/update-me.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { Roles } from 'src/decorators/roles.decorator'
 import { CONSTANTS } from '../common/constants'
+import { join } from 'path'
 
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Get('me')
   @UsePipes(new ValidationPipe())
   async getMe(@Req() request: Request, @Res() response: Response) {
     try {
-      const user = await this.userService.findOne({ where: { id: request['user']['id'] } })
+      const user = await this.userService.findOne({ where: { id: request['user']['id'] }, relations: ['patient', 'therapist'] })
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Success',
@@ -41,6 +42,7 @@ export class UserController {
         user,
       })
     } catch (error) {
+      console.log({ error })
       return response.status(error.statusCode ?? error.status ?? 400).json({
         error,
       })
@@ -116,5 +118,10 @@ export class UserController {
         error,
       })
     }
+  }
+
+  @Get('consent')
+  getFile() {
+    return join(process.cwd(), 'src/static-files/consent.pdf')
   }
 }

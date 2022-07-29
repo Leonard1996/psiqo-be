@@ -4,19 +4,22 @@ import { User } from './user.entity'
 
 @Entity('therapists')
 export class Therapist extends BasicEntity {
-    @PrimaryGeneratedColumn()
-    id: number
+  @PrimaryGeneratedColumn()
+  id: number
 
-    @Column({ type: "varchar" })
-    cv: string
+  @Column({ type: 'varchar' })
+  cv: string
 
-    @Column({ type: "int" })
-    userId: number
+  @Column({ type: 'int' })
+  userId: number
 
-    @Column({ type: "json" })
-    details: string
+  @Column({ type: 'json' })
+  details: string
 
-    @OneToOne(() => User, (user) => user.therapist)
-    @JoinColumn()
-    user: User
+  @Column({ type: 'varchar', nullable: true })
+  profilePicture: string
+
+  @OneToOne(() => User, (user) => user.therapist)
+  @JoinColumn()
+  user: User
 }
