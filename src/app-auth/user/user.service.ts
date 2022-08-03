@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common'
-import { DataSource, Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from '../../entities/user.entity'
 import { RegisterDto } from '../auth/dto/register.dto'
@@ -14,7 +14,7 @@ const crypto = require('crypto')
 @Injectable()
 export class UserService {
   @InjectRepository(User)
-  private usersRepository: Repository<User>
+  private userRepository: Repository<User>
   @InjectRepository(Therapist)
   private therapistRepository: Repository<Therapist>
   @InjectRepository(Patient)
@@ -23,7 +23,7 @@ export class UserService {
   async findOneBy(fieldValue: { [key: string]: string }): Promise<User | undefined> {
     const field = Object.keys(fieldValue)[0]
     const value = Object.values(fieldValue)[0]
-    return this.usersRepository
+    return this.userRepository
       .createQueryBuilder('users')
       .addSelect('users.password')
       .leftJoinAndSelect('users.therapist', 'therapist')
@@ -35,44 +35,51 @@ export class UserService {
   async register(registerDto: RegisterDto): Promise<User> {
     const password = crypto.createHash('sha256').update(registerDto.password).digest('hex')
     const isSingle = registerDto.isSingle === 'true' ? true : false
-    const user = this.usersRepository.create({ ...registerDto, password, isSingle })
-    return this.usersRepository.save(user)
+    let user = this.userRepository.create({ ...registerDto, password, isSingle })
+    user = await this.userRepository.save(user)
+
+    const patient = this.patientRepository.create({
+      user,
+      details: registerDto['details'],
+      newsletter: registerDto['newsletter'],
+    })
+    await this.patientRepository.save(patient)
+    return user
   }
 
   async validate(verificationDto: VerificationDto) {
     const { verificationCode, email } = verificationDto
-    const isMatching = await this.usersRepository.findOne({ where: { verificationCode, email } })
+    const isMatching = await this.userRepository.findOne({ where: { verificationCode, email } })
     if (isMatching) {
       if (isMatching.isActive) {
         throw new ConflictException('Account is already validated')
       }
-      const validatedUser = this.usersRepository.merge(isMatching, { isActive: true })
-      return this.usersRepository.save(validatedUser)
+      const validatedUser = this.userRepository.merge(isMatching, { isActive: true })
+      return this.userRepository.save(validatedUser)
     }
     throw new ConflictException('Invalid verification code or email')
   }
 
   findOne(whereCondition: any) {
-    console.log({ whereCondition })
-    return this.usersRepository.findOneOrFail(whereCondition)
+    return this.userRepository.findOneOrFail(whereCondition)
   }
 
   async updateOne(id: number, updateMeDto: UpdateMeDto | UpdateUserDto) {
-    const existingUser = await this.usersRepository.findOneOrFail({ where: { id }, relations: ['patient'] })
+    const existingUser = await this.userRepository.findOneOrFail({ where: { id }, relations: ['patient'] })
     if (updateMeDto.hasOwnProperty('password')) {
       updateMeDto.password = crypto.createHash('sha256').update(updateMeDto.password).digest('hex')
     }
     const patient = { ...existingUser.patient, details: updateMeDto.details, newsletter: updateMeDto.newsletter }
-    const user = this.usersRepository.merge(existingUser, updateMeDto)
+    const user = this.userRepository.merge(existingUser, updateMeDto)
     if (updateMeDto.details && updateMeDto.newsletter !== undefined) {
       await this.patientRepository.save(patient)
       user.patient = patient
     }
-    return this.usersRepository.save(user)
+    return this.userRepository.save(user)
   }
 
   getUnreadFormNotifications() {
-    return this.usersRepository
+    return this.userRepository
       .createQueryBuilder('u')
       .select(['u.id', 'u.name', 'u.lastName'])
       .where('u.isFormRead = :isFormRead', { isFormRead: false })
@@ -83,14 +90,14 @@ export class UserService {
   }
 
   getFormDetails(id: number) {
-    return this.usersRepository.save({
+    return this.userRepository.save({
       id,
       isFormRead: true,
     })
   }
 
   checkConfirmStatus(id: number) {
-    return this.usersRepository
+    return this.userRepository
       .createQueryBuilder('u')
       .innerJoin('patientsDoctors', 'pd', 'pd.patientId = u.id')
       .innerJoin('sessions', 's', 's.patientDoctorId = pd.id')

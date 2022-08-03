@@ -32,4 +32,7 @@ export class Session extends BasicEntity {
 
   @Column({ type: 'text', nullable: true })
   notes: string
+
+  @Column({ type: 'tinyint', default: false })
+  done: boolean
 }

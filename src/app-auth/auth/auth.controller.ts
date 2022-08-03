@@ -6,7 +6,6 @@ import { RegisterDto } from './dto/register.dto'
 import { VerificationDto } from './dto/verification.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import global from 'src/global/file-config'
-import * as crypto from 'crypto'
 import { UserService } from '../user/user.service'
 import { ROLES } from '../common/constants'
 

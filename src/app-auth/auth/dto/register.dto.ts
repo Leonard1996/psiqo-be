@@ -29,5 +29,5 @@ export class RegisterDto {
 
   isSingle?: string
 
-  role?:string
+  role?: string
 }
