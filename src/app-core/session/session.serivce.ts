@@ -44,7 +44,7 @@ export class SessionService {
 
   async create(createSessionDto: CreateSessionDto, doctorId: number) {
     const { id } = await this.patientDoctorRepository.findOneOrFail({ where: { doctorId, patientId: createSessionDto.patientId } })
-    const session = this.sessionRepository.create({ ...createSessionDto, id })
+    const session = this.sessionRepository.create({ ...createSessionDto, patientDoctorId: id })
     return this.sessionRepository.save(session)
   }
 

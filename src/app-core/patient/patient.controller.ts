@@ -1,4 +1,18 @@
-import { Controller, Res, UseGuards, HttpStatus, Post, UseInterceptors, UploadedFile, Req, Get } from '@nestjs/common'
+import {
+  Controller,
+  Res,
+  UseGuards,
+  HttpStatus,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+  Req,
+  Get,
+  Patch,
+  Param,
+  ParseIntPipe,
+  Body,
+} from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from 'src/guards/roles.guard'
@@ -39,6 +53,27 @@ export class PatientController {
         statusCode: HttpStatus.OK,
         message: 'Success',
         therapist,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Patch(':patientId')
+  @Roles(CONSTANTS.ROLES.DOCTOR)
+  async updateNotes(
+    @Req() request: Request,
+    @Res() response: Response,
+    @Param('patientId', ParseIntPipe) patientId: number,
+    @Body('notes') notes: string,
+  ) {
+    try {
+      await this.patientService.updateNotes(request['user']['id'], patientId, notes)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Notes updates successfully',
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({

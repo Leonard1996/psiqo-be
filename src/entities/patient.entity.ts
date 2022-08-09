@@ -46,4 +46,7 @@ export class Patient extends BasicEntity {
 
   @Column({ type: 'tinyint', default: false })
   newsletter: boolean
+
+  @Column({ type: 'text', nullable: true })
+  notes: string
 }
