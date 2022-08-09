@@ -61,17 +61,17 @@ export class SessionController {
 
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true }))
-  @Roles(CONSTANTS.ROLES.SUBADMIN)
-  async create(@Body() createSessionDto: CreateSessionDto, @Res() response: Response) {
+  @Roles(CONSTANTS.ROLES.SUBADMIN, CONSTANTS.ROLES.DOCTOR)
+  async create(@Body() createSessionDto: CreateSessionDto, @Res() response: Response, @Req() request: Request) {
     try {
-      const agenda = await this.sessionService.create(createSessionDto)
-      const { doctorName, name, id, email, doctorId } = await this.patientDoctorService.findOneWithDetails(createSessionDto.patientDoctorId)
-      await this.mailService.sendSessionValidation(doctorName, { email, id, name }, agenda.startTime, agenda.endTime)
+      const session = await this.sessionService.create(createSessionDto, request['user']['id'])
+      const { doctorName, name, id, email, doctorId } = await this.patientDoctorService.findOneWithDetails(session.patientDoctorId)
+      await this.mailService.sendSessionValidation(doctorName, { email, id, name }, session.startTime, session.endTime)
       this.sessionCreatedEventService.emit(doctorId, SERVER_SENT_EVENT_TYPE.SESSION_CREATED_EVENT)
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Success',
-        agenda,
+        session,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({

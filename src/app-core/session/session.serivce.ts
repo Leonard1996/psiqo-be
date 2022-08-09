@@ -14,21 +14,25 @@ export class SessionService {
   private sessionRepository: Repository<Session>
   @InjectRepository(User)
   private userRepository: Repository<User>
+  @InjectRepository(PatientDoctor)
+  private patientDoctorRepository: Repository<PatientDoctor>
 
   getDoctorAgenda(doctorId: number, month: number) {
     month = Number(month) || Number(new Date().getMonth() + 1)
     return this.sessionRepository
       .createQueryBuilder('s')
+      .select('s.*, u.name, u.lastName')
       .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+      .innerJoin('users', 'u', 'u.id = pd.patientId')
       .where('s.month = :month', { month })
       .andWhere('pd.doctorId = :doctorId', { doctorId })
-      .getMany()
+      .getRawMany()
   }
 
   getNextConfirmedSession(doctorId: number) {
     return this.sessionRepository
       .createQueryBuilder('s')
-      .select('s.startTime, u.name ,u.lastName')
+      .select('s.startTime, u.name, u.lastName')
       .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
       .innerJoin('users', 'u', 'u.id = pd.patientId')
       .where('pd.doctorId = :doctorId', { doctorId })
@@ -38,8 +42,9 @@ export class SessionService {
       .getRawOne()
   }
 
-  create(createSessionDto: CreateSessionDto) {
-    const session = this.sessionRepository.create(createSessionDto)
+  async create(createSessionDto: CreateSessionDto, doctorId: number) {
+    const { id } = await this.patientDoctorRepository.findOneOrFail({ where: { doctorId, patientId: createSessionDto.patientId } })
+    const session = this.sessionRepository.create({ ...createSessionDto, id })
     return this.sessionRepository.save(session)
   }
 

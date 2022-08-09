@@ -6,4 +6,6 @@ export class UpdateUserDto {
   password?: string
   details?: string
   newsletter?: boolean
+  newPassword?: string
+  confirmPassword?: string
 }

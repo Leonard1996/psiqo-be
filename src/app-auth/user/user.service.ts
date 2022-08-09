@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from '../../entities/user.entity'
@@ -32,18 +32,21 @@ export class UserService {
       .getOne()
   }
 
-  async register(registerDto: RegisterDto): Promise<User> {
+  async register(registerDto: RegisterDto, skipVerification?: boolean): Promise<User> {
     const password = crypto.createHash('sha256').update(registerDto.password).digest('hex')
     const isSingle = registerDto.isSingle === 'true' ? true : false
     let user = this.userRepository.create({ ...registerDto, password, isSingle })
     user = await this.userRepository.save(user)
 
-    const patient = this.patientRepository.create({
-      user,
-      details: registerDto['details'],
-      newsletter: registerDto['newsletter'],
-    })
-    await this.patientRepository.save(patient)
+    if (skipVerification) {
+      const patient = this.patientRepository.create({
+        user,
+        details: registerDto['details'],
+        newsletter: registerDto['newsletter'],
+      })
+      await this.patientRepository.save(patient)
+    }
+
     return user
   }
 
@@ -66,8 +69,12 @@ export class UserService {
 
   async updateOne(id: number, updateMeDto: UpdateMeDto | UpdateUserDto) {
     const existingUser = await this.userRepository.findOneOrFail({ where: { id }, relations: ['patient'] })
-    if (updateMeDto.hasOwnProperty('password')) {
-      updateMeDto.password = crypto.createHash('sha256').update(updateMeDto.password).digest('hex')
+
+    if (updateMeDto.hasOwnProperty('newPassword')) {
+      if (existingUser.password !== crypto.createHash('sha256').update(updateMeDto.password).digest('hex'))
+        throw new BadRequestException('Password mismatch')
+      if (updateMeDto.newPassword !== updateMeDto.confirmPassword) throw new BadRequestException('New password mismatch')
+      updateMeDto.password = crypto.createHash('sha256').update(updateMeDto.newPassword).digest('hex')
     }
     const patient = { ...existingUser.patient, details: updateMeDto.details, newsletter: updateMeDto.newsletter }
     const user = this.userRepository.merge(existingUser, updateMeDto)

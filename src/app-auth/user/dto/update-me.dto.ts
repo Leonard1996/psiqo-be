@@ -19,4 +19,16 @@ export class UpdateMeDto {
   details: string
   @Allow()
   newsletter: boolean
+  @Allow()
+  @IsString()
+  @MinLength(8)
+  @MaxLength(20)
+  @IsOptional()
+  newPassword?: string
+  @Allow()
+  @IsString()
+  @MinLength(8)
+  @MaxLength(20)
+  @IsOptional()
+  confirmPassword?: string
 }

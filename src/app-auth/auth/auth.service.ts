@@ -53,7 +53,7 @@ export class AuthService {
     if (isExisting) {
       throw new ConflictException('User with this email already exists')
     }
-    const user = await this.userService.register(registerDto)
+    const user = await this.userService.register(registerDto, skipVerification)
     !skipVerification && this.mailService.sendUserValidation(user)
     return user
   }
