@@ -18,9 +18,10 @@ export class PatientService {
   getLatestTherapist(id: number) {
     return this.patientRepository
       .createQueryBuilder('p')
-      .select(['t.*'])
+      .select('t.*, u.* ')
       .innerJoin('patientsDoctors', 'pd', 'pd.patientId = p.userId')
       .innerJoin('therapists', 't', 't.userId = pd.doctorId')
+      .innerJoin('users', 'u', 't.userId = u.id')
       .where('p.userId = :id', { id })
       .orderBy('pd.id', 'DESC')
       .limit(1)

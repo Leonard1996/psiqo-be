@@ -38,7 +38,7 @@ export class UserService {
     let user = this.userRepository.create({ ...registerDto, password, isSingle })
     user = await this.userRepository.save(user)
 
-    if (skipVerification) {
+    if (!skipVerification) {
       const patient = this.patientRepository.create({
         user,
         details: registerDto['details'],

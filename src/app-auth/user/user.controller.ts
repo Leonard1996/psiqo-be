@@ -1,4 +1,17 @@
-import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpStatus, Patch, Body, Param, ParseIntPipe } from '@nestjs/common'
+import {
+  Controller,
+  ValidationPipe,
+  UsePipes,
+  Res,
+  Get,
+  UseGuards,
+  Req,
+  HttpStatus,
+  Patch,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { UserService } from './user.service'
@@ -42,7 +55,6 @@ export class UserController {
         user,
       })
     } catch (error) {
-      console.log({ error })
       return response.status(error.statusCode ?? error.status ?? 400).json({
         error,
       })
