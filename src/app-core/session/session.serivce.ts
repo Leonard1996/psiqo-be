@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common'
 import { Connection, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from 'src/entities/session.entity'
@@ -44,11 +44,18 @@ export class SessionService {
 
   async create(createSessionDto: CreateSessionDto, doctorId: number) {
     const { id } = await this.patientDoctorRepository.findOneOrFail({ where: { doctorId, patientId: createSessionDto.patientId } })
+    const undoneSession = await this.sessionRepository.findOne({
+      where: {
+        patientDoctorId: id,
+        done: true,
+      },
+    })
+    if (!undoneSession) throw new BadRequestException('Undone session in queue')
     const session = this.sessionRepository.create({ ...createSessionDto, patientDoctorId: id })
     return this.sessionRepository.save(session)
   }
 
-  async confirm(userId: number) {
+  async confirm(userId: number, sessionId: number) {
     const queryRunner = this.connection.createQueryRunner()
     await queryRunner.connect()
 
@@ -58,6 +65,7 @@ export class SessionService {
       .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
       .innerJoin('users', 'u', 'u.id = pd.patientId')
       .where('s.isConfirmed = :isConfirmed', { isConfirmed: false })
+      .where('s.id = :sessionId', { sessionId })
       .andWhere('u.id = :userId', { userId })
       .getRawOne()
 
@@ -75,7 +83,15 @@ export class SessionService {
         .andWhere('users.credit > 0')
         .execute()
 
-      await this.sessionRepository.update({ id: unconfirmedSession.sessionId }, { isConfirmed: true })
+      // await this.sessionRepository.update({ id: unconfirmedSession.sessionId }, { isConfirmed: true })
+
+      await queryRunner.manager
+        .getRepository(Session)
+        .createQueryBuilder('sessions')
+        .update(Session)
+        .set({ isConfirmed: true })
+        .where('id = :id', { id: unconfirmedSession.sessionId })
+        .execute()
 
       await queryRunner.commitTransaction()
       result = true
@@ -122,12 +138,33 @@ export class SessionService {
   getPatients(doctorId: number, name: string) {
     return this.userRepository
       .createQueryBuilder('u')
-      .select('u2.*, p.*')
+      .select('u2.*')
       .innerJoin('patientsDoctors', 'pd', 'pd.doctorId = u.id')
       .innerJoin('users', 'u2', 'u2.id = pd.patientId')
-      .innerJoin('patients', 'p', 'p.userId = u2.id')
       .where('pd.doctorId = :doctorId', { doctorId })
       .andWhere(`${name?.length ? `concat(u2.name,u2.lastName) LIKE '%${name}%'` : true}`)
+      .getRawMany()
+  }
+
+  nextSession(patientId: string) {
+    return this.sessionRepository
+      .createQueryBuilder('s')
+      .select('s.*')
+      .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+      .where('pd.patientId = :patientId ', { patientId })
+      .andWhere('s.done = :done', { done: false })
+      .getRawOne()
+  }
+
+  getPatientDetails(patientId: number) {
+    return this.sessionRepository
+      .createQueryBuilder('s')
+      .select('COUNT(s.id) as numberOfSessions, p.*, u.*')
+      .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+      .innerJoin('users', 'u', 'u.id = pd.patientId')
+      .innerJoin('patients', 'p', 'p.userId = u.id')
+      .where('s.done = :done', { done: true })
+      .andWhere('u.id = :patientId', { patientId })
       .getRawMany()
   }
 }

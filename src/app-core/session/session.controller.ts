@@ -85,12 +85,12 @@ export class SessionController {
     return this.sessionCreatedEventService.subscribe(doctorId)
   }
 
-  @Patch('confirm')
+  @Patch(':id/confirm')
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true }))
   @Roles(CONSTANTS.ROLES.PATIENT)
-  async confirm(@Req() request: Request, @Res() response: Response) {
+  async confirm(@Req() request: Request, @Res() response: Response, @Param('id', ParseIntPipe) id: number) {
     try {
-      const session = await this.sessionService.confirm(request['user']['id'])
+      const session = await this.sessionService.confirm(request['user']['id'], id)
       this.mailService.sendSessionLink(session.link, request['user']['email'], session.patientName)
 
       axios.post(process.env.CRONE_SERVER_LINK + '/crones/confirmed-session-reminder', {
@@ -165,6 +165,41 @@ export class SessionController {
           delete patient.password
           return patient
         }),
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get('patients/next-session')
+  @Roles(CONSTANTS.ROLES.PATIENT)
+  async getNextSession(@Req() request: Request, @Res() response: Response) {
+    try {
+      const nextSession = await this.sessionService.nextSession(request['user']['id'])
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        nextSession,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get('/patients/:patientId')
+  @UsePipes(new ValidationPipe())
+  @Roles(CONSTANTS.ROLES.DOCTOR)
+  async getPatientDetails(@Req() request: Request, @Res() response: Response, @Param('patientId', ParseIntPipe) patientId: number) {
+    try {
+      const patientDetails = await this.sessionService.getPatientDetails(patientId)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        patientDetails,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({
