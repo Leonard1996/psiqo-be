@@ -5,6 +5,8 @@ import { Session } from 'src/entities/session.entity'
 import { CreateSessionDto } from './dto/create.session-dto'
 import { User } from 'src/entities/user.entity'
 import { PatientDoctor } from 'src/entities/patient.doctor.entity'
+import axios from 'axios'
+const crypto = require('crypto')
 
 @Injectable()
 export class SessionService {
@@ -51,7 +53,7 @@ export class SessionService {
       },
     })
     if (!undoneSession) throw new BadRequestException('Undone session in queue')
-    const session = this.sessionRepository.create({ ...createSessionDto, patientDoctorId: id })
+    const session = this.sessionRepository.create({ ...createSessionDto, patientDoctorId: id, link: crypto.randomUUID() })
     return this.sessionRepository.save(session)
   }
 
@@ -166,5 +168,22 @@ export class SessionService {
       .where('s.done = :done', { done: true })
       .andWhere('u.id = :patientId', { patientId })
       .getRawMany()
+  }
+
+  async getRTCToken(id: number, uuid: number, userId: number, role: string, channelName: string) {
+    const idRoleType = role === 'doctor' ? 'pd.doctorId' : 'pd.patientId'
+
+    const existingSessions = await this.sessionRepository
+      .createQueryBuilder('s')
+      .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+      .where('s.id= :id', { id })
+      .andWhere('s.link = :uuid', { uuid })
+      .andWhere(`${idRoleType} = :userId`, { userId })
+      .andWhere('s.done = :done', { done: false })
+      .getOne()
+
+    if (!existingSessions) throw new BadRequestException("Session doesn't exit")
+
+    return axios.get(process.env.RTC_TOKEN_LINK + channelName)
   }
 }

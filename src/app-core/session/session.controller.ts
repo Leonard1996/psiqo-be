@@ -27,6 +27,7 @@ import { MailService } from '../mail/services/mail.service'
 import { PatientDoctorService } from '../patient-doctor/patient.doctor.service'
 import { SessionCreatedEventService } from './session.created.event.service'
 import { SERVER_SENT_EVENT_TYPE } from '../common/server.sent.event.types'
+import { channel } from 'diagnostics_channel'
 const axios = require('axios').default
 
 @Controller('sessions')
@@ -200,6 +201,32 @@ export class SessionController {
         statusCode: HttpStatus.OK,
         message: 'Success',
         patientDetails,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get(':id/verify/:uuid')
+  @UsePipes(new ValidationPipe())
+  @Roles(CONSTANTS.ROLES.DOCTOR, CONSTANTS.ROLES.PATIENT)
+  async getRTCToken(
+    @Req() request: Request,
+    @Param('uuid') uuid: number,
+    @Param('id') id: number,
+    @Res() response: Response,
+    @Query('channelName') channelName: string,
+  ) {
+    try {
+      const {
+        data: { key: RTCToken },
+      } = await this.sessionService.getRTCToken(id, uuid, request['user']['id'], request['user']['role'], channelName)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        RTCToken,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({

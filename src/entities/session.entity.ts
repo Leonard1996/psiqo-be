@@ -27,6 +27,7 @@ export class Session extends BasicEntity {
   @Column({ type: 'int' })
   month: number
 
+  @Index()
   @Column({ type: 'varchar', nullable: true })
   link: string
 
