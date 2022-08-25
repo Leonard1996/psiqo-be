@@ -180,6 +180,7 @@ export class SessionService {
       .andWhere('s.link = :uuid', { uuid })
       .andWhere(`${idRoleType} = :userId`, { userId })
       .andWhere('s.done = :done', { done: false })
+      .andWhere('s.isConfirmed = :isConfirmed', { isConfirmed: true })
       .getOne()
 
     if (!existingSessions) throw new BadRequestException("Session doesn't exit")
