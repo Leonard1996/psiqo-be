@@ -194,7 +194,7 @@ export class SessionController {
   @Get('/patients/:patientId')
   @UsePipes(new ValidationPipe())
   @Roles(CONSTANTS.ROLES.DOCTOR)
-  async getPatientDetails(@Req() request: Request, @Res() response: Response, @Param('patientId', ParseIntPipe) patientId: number) {
+  async getPatientDetails(@Res() response: Response, @Param('patientId', ParseIntPipe) patientId: number) {
     try {
       const numberOfSessions = await this.sessionService.getNumberOfSessions(patientId)
       const patientDetails = await this.sessionService.getPatientDetails(patientId)

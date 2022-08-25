@@ -166,7 +166,7 @@ export class SessionService {
       .innerJoin('users', 'u', 'u.id = pd.patientId')
       .where('s.done = :done', { done: true })
       .andWhere('u.id = :patientId', { patientId })
-      .getRawMany()
+      .getRawOne()
   }
 
   getPatientDetails(patientId: number) {
