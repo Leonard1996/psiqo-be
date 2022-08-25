@@ -196,11 +196,16 @@ export class SessionController {
   @Roles(CONSTANTS.ROLES.DOCTOR)
   async getPatientDetails(@Req() request: Request, @Res() response: Response, @Param('patientId', ParseIntPipe) patientId: number) {
     try {
+      const numberOfSessions = await this.sessionService.getNumberOfSessions(patientId)
       const patientDetails = await this.sessionService.getPatientDetails(patientId)
+      const nextSessions = await this.sessionService.nextSession(patientId)
+
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Success',
         patientDetails,
+        numberOfSessions,
+        nextSessions,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({

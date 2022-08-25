@@ -32,7 +32,6 @@ io.on('connection', (socket)=>{
       socket.on('createMessage',function(message){
         const [result, error] = verifyJwtToken(token)
         if (error) return;
-        console.log({result,message})
         const room = result.role ==='patient'?`${result.id}-${message.receiver}`:`${message.receiver}-${result.id}`
 
         io.sockets.in(room).emit('newMessage', message);

@@ -1,7 +1,7 @@
 
 const socket=io('http://localhost:4999',{
   extraHeaders: {
-      Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ1c2VyMkB1c2VyLmNvbSIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNjYxMzU1NjQ1LCJleHAiOjkwMDcyMDA5MTYwOTY2MzZ9.-DGUmzx8YHcfmJIIc3V3sel9SxEcQwLKglmIrl1TXNM'
+      Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJkb2NAZG9jLmNvbSIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE2NjE0NTQ2NDgsImV4cCI6OTAwNzIwMDkxNjE5NTY0MH0.fyw_2QgrFPYZIETFGw8wr8GB3a40_CoCVky17A6nxi4'
     }
 })
 

@@ -148,7 +148,7 @@ export class SessionService {
       .getRawMany()
   }
 
-  nextSession(patientId: string) {
+  nextSession(patientId: number) {
     return this.sessionRepository
       .createQueryBuilder('s')
       .select('s.*')
@@ -158,16 +158,19 @@ export class SessionService {
       .getRawOne()
   }
 
-  getPatientDetails(patientId: number) {
+  getNumberOfSessions(patientId: number) {
     return this.sessionRepository
       .createQueryBuilder('s')
-      .select('COUNT(s.id) as numberOfSessions, p.*, u.*')
+      .select('COUNT(s.id) as numberOfSessions')
       .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
       .innerJoin('users', 'u', 'u.id = pd.patientId')
-      .innerJoin('patients', 'p', 'p.userId = u.id')
       .where('s.done = :done', { done: true })
       .andWhere('u.id = :patientId', { patientId })
       .getRawMany()
+  }
+
+  getPatientDetails(patientId: number) {
+    return this.userRepository.createQueryBuilder('u').innerJoinAndSelect('u.patient', 'patient').where('u.id = :patientId', { patientId }).getOne()
   }
 
   async getRTCToken(id: number, uuid: number, userId: number, role: string, channelName: string) {

@@ -11,8 +11,8 @@ export class PatientService {
   @InjectRepository(PatientDoctor)
   private patientDoctorRepository: Repository<PatientDoctor>
 
-  uploadConsent(id: number, consent: string) {
-    return this.patientRepository.update(id, { consent })
+  uploadConsent(userId: number, consent: string) {
+    return this.patientRepository.update(userId, { consent })
   }
 
   getLatestTherapist(id: number) {
