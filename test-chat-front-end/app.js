@@ -10,14 +10,25 @@ const socket=io('http://localhost:4999',{
 // connection with server
 // room -> patient user id - doctor user id
 socket.emit('create', '1-2');
+
 socket.on('connect', function(){
 
+});
+
+socket.on('roomCreated', ()=>{
+  socket.emit('requestHistory', 2)
+})
+
+socket.on('loadHistory', function(messages){
+  messageList.innerHTML = ''
+  Object.values(messages).forEach(message => {
+    messageList.innerHTML+='<div>' + message.value + '</div>'
+  })
 });
  
 // message listener from server
 const messageList = document.querySelector('.messages')
 socket.on('newMessage', function(message){
-    console.log({message})
     messageList.innerHTML+='<div>' + message.value + '</div>'
 });
 
