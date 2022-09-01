@@ -6,15 +6,15 @@ const socketIO = require('socket.io')
 const http = require('http')
 const jwt = require('jsonwebtoken')
 const redis = require('redis')
-const { parse } = require('path')
+
 
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
 
 const client = redis.createClient()
-let existingChat = '{}';
-// client.on('error', (err) => console.log('Redis Client Error', err))
+
+client.on('error', (err) => console.log('Redis Client Error', err));
 (async function startServer() {
   await client.connect()
 
@@ -33,20 +33,26 @@ let existingChat = '{}';
   io.on('connection', (socket) => {
     console.log('New user connected')
     const token = socket.handshake.headers.authorization
-    const [result, error] = verifyJwtToken(token)
-    if (error) return
    
+    socket.on('requestHistory', async function (receiver){
+      const [result, error] = verifyJwtToken(token)
+      if (error) return
 
-    socket.on('requestHistory', function (receiver){
       const room = result.role === 'patient' ? `${result.id}-${receiver}` : `${receiver}-${result.id}`
 
-      io.sockets.in(room).emit('loadHistory', JSON.parse(existingChat))
+      const existingChat = await client.hGetAll(room)
+      for (const value in existingChat) {
+        existingChat[value] = JSON.parse(existingChat[value])
+      }
+    
+      io.sockets.in(room).emit('loadHistory', existingChat)
     })
 
     socket.on('create', async function (room) {
+      const [result, error] = verifyJwtToken(token)
+      if (error) return
+      if (!room.split('').includes(result.id.toString())) return
       socket.join(room)
-
-      existingChat = await client.get(room) || '{}'
 
       io.sockets.in(room).emit('roomCreated')
 
@@ -54,12 +60,27 @@ let existingChat = '{}';
         const [result, error] = verifyJwtToken(token)
         if (error) return
       
+        const date = Date.now()
+        message = {...message, date }
 
         io.sockets.in(room).emit('newMessage', message)
 
-        client.set(room, JSON.stringify({...JSON.parse(existingChat), [+new Date()]: message}))
+        client.hSet(room, date, JSON.stringify(message))
+      })
+
+      socket.on('seen', async function(message){
+        const [result, error] = verifyJwtToken(token)
+        if (error) return
+       
+        const room = result.role === 'patient' ? `${result.id}-${message.seen.receiver}` : `${message.seen.receiver}-${result.id}`
+
+        io.sockets.in(room).emit('notifySeen', message)
+        client.hSet(room, message.date, JSON.stringify(message))
+  
       })
     })
+
+  
 
     socket.on('disconnect', () => {
       console.log('disconnected from user')
