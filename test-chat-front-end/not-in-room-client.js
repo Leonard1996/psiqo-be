@@ -15,18 +15,25 @@ socket.on('roomCreated', ()=>{
   socket.emit('requestHistory', 1)
 })
 const messageList = document.querySelector('.messages')
+let messagesData = []
 
 socket.on('loadHistory', function(messages){
   messageList.innerHTML = ''
-  Object.values(messages).forEach(message => {
-    messageList.innerHTML+='<div>' + message.value + '</div>'
+  messagesData = []
+
+  const messagesArray = Object.values(messages)
+  messagesArray.sort((firstMessage, secondMessage)=>firstMessage.date - secondMessage.date)
+  messagesArray.forEach(message => {
+    messageList.innerHTML+=`<div>` + message.value + ` ${message.seen && message.receiver === 1 ? 'SEEN' : ''}`+ '</div>'
+    messagesData.push(message)
   })
 });
 
 // message listener from server
 
 socket.on('newMessage', function(message){
-  messageList.innerHTML+='<div>' + message.value + '</div>'
+  messagesData.push(message)
+  messageList.innerHTML+=`<div>` + message.value + '</div>'
 });
 
 // emits message from user side
@@ -43,3 +50,44 @@ function send(){
       receiver:1
     });
 }
+// id of this user = 2
+const button = document.querySelector('input')
+
+button.addEventListener(
+  'focus',
+  function (event) {
+    for (let i=messagesData.length -1 ; i>=0;i--){
+      if (messagesData[i].receiver === 2){
+
+        if (!messagesData[i].seen) {
+          socket.emit('seen', {...messagesData[i], seen:{receiver:1}, date:messagesData[i].date})
+        }
+
+        break;
+      }
+    }
+  },
+  false,
+)
+
+
+socket.on('notifySeen', function(message){
+
+  let seenMessageIndex
+  if (message.seen.receiver !== 2) return
+  messagesData.forEach((md, index) =>{
+    if (md.date === message.date) seenMessageIndex = index
+  })
+
+  messageList.innerHTML = ''
+  console.log({messageList, messagesData})
+  messagesData.forEach((message, index) => {
+    if (message.date <= messagesData[seenMessageIndex].date && message.receiver !==2) {
+      messageList.innerHTML +=`<div>` + message.value +" SEEN" +'</div>'
+    }  else {
+      messageList.innerHTML +=`<div>` + message.value +'</div>'
+    }
+  })
+
+
+})
