@@ -4,6 +4,12 @@ import { Global, Module } from '@nestjs/common'
 import { MailService } from './services/mail.service'
 import { join } from 'path'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { UserService } from 'src/app-auth/user/user.service'
+import { User } from 'src/entities/user.entity'
+import { UsersModule } from 'src/app-auth/user/user.module'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Therapist } from 'src/entities/therapist.entity'
+import { Patient } from 'src/entities/patient.entity'
 
 @Global()
 @Module({
@@ -32,8 +38,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
       }),
       inject: [ConfigService],
     }),
+    UsersModule,
+    TypeOrmModule.forFeature([User, Therapist, Patient]),
   ],
-  providers: [MailService, ConfigService],
+  providers: [MailService, ConfigService, UserService],
   exports: [MailService],
 })
 export class MailModule {}

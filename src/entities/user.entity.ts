@@ -4,6 +4,7 @@ import { BasicEntity } from './basic.entity'
 import { PatientDoctor } from './patient.doctor.entity'
 import { Therapist } from './therapist.entity'
 import { Patient } from './patient.entity'
+import { PromoCode } from './promo.code.entity'
 
 @Entity('users')
 export class User extends BasicEntity {
@@ -61,6 +62,12 @@ export class User extends BasicEntity {
 
   @OneToOne(() => Patient, (patient) => patient.user)
   patient: Patient
+
+  @OneToMany(() => PromoCode, (promoCode) => promoCode.user)
+  promoCodes: PromoCode[]
+
+  @Column({ type: 'tinyint', default: false })
+  hasUsedPromoCode: boolean
 
   @BeforeInsert()
   generateVerificationCode() {

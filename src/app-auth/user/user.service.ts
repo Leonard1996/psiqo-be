@@ -118,4 +118,8 @@ export class UserService {
     const therapist = this.therapistRepository.create(registerTherapistDto)
     return this.therapistRepository.save(therapist)
   }
+
+  listPatients(id?: number) {
+    return this.userRepository.find({ where: { role: 'patient', ...(id && { id }) } })
+  }
 }

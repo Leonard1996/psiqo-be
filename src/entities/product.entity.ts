@@ -18,8 +18,8 @@ export class Product extends BasicEntity {
   @Column({ type: 'int' })
   price: number
 
-  @Column({ type: 'varchar' })
-  taxes: string
+  @Column({ type: 'int' })
+  tax: number
 
   @Column({ type: 'tinyint' })
   status: boolean
