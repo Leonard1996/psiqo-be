@@ -12,7 +12,7 @@ const socket=io('http://localhost:4999',{
 socket.emit('create', '1-2');
 
 socket.on('roomCreated', ()=>{
-  socket.emit('requestHistory', 1)
+  socket.emit('requestHistory', 2)
 })
 const messageList = document.querySelector('.messages')
 let messagesData = []
@@ -88,5 +88,35 @@ messagesData.forEach((message) => {
   }
 })
 
+})
 
+function startTyping(){
+  socket.emit('typing',{
+    receiver:2
+  });
+}
+
+let timeout;
+
+function stopTyping(){
+    clearTimeout(timeout)
+
+    timeout = setTimeout(()=>{
+      socket.emit('stopTyping',{
+        receiver:2
+      });
+    }, 500)
+}
+
+socket.on('showTyping', function(data){
+  if (data.isTyping !== 1) {
+    button.placeholder = 'typing...'
+  }
+})
+
+
+socket.on('unshowTyping', function(data){
+  if (data.isTyping !== 1) {
+      button.placeholder = ''
+  }
 })

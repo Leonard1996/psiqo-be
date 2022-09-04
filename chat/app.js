@@ -41,6 +41,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
       const room = result.role === 'patient' ? `${result.id}-${receiver}` : `${receiver}-${result.id}`
 
       const existingChat = await client.hGetAll(room)
+
       for (const value in existingChat) {
         existingChat[value] = JSON.parse(existingChat[value])
       }
@@ -78,6 +79,28 @@ client.on('error', (err) => console.log('Redis Client Error', err));
         client.hSet(room, message.date, JSON.stringify(message))
   
       })
+
+      socket.on('typing', async function(message){
+        const [result, error] = verifyJwtToken(token)
+        if (error) return
+       
+        const room = result.role === 'patient' ? `${result.id}-${message.receiver}` : `${message.receiver}-${result.id}`
+        io.sockets.in(room).emit('showTyping', {isTyping: result.id})
+  
+      })
+
+      socket.on('stopTyping', async function(message){
+        const [result, error] = verifyJwtToken(token)
+        if (error) return
+     
+       
+        const room = result.role === 'patient' ? `${result.id}-${message.receiver}` : `${message.receiver}-${result.id}`
+
+        io.sockets.in(room).emit('unshowTyping', {isTyping: result.id})
+  
+      })
+
+  
     })
 
   

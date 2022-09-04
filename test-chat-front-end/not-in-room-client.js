@@ -88,6 +88,29 @@ socket.on('notifySeen', function(message){
       messageList.innerHTML +=`<div>` + message.value +'</div>'
     }
   })
+})
 
+function startTyping(){
+  socket.emit('typing',{
+    receiver:1
+  });
+}
 
+function stopTyping(){
+  socket.emit('stopTyping',{
+    receiver:1
+  });
+}
+
+socket.on('showTyping', function(data){
+  console.log({data})
+  if (data.isTyping !== 2) {
+    button.placeholder = 'typing...'
+  }
+})
+
+socket.on('unshowTyping', function(data){
+  if (data.isTyping !== 2) {
+      button.placeholder = ''
+  }
 })
