@@ -8,7 +8,7 @@ import { GiftCardService } from './gift.card.service'
 import CreateGiftCardDto from './dto/create.gift.card-dto'
 
 @Controller('gift-cards')
-// @UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class GiftCardController {
   constructor(private readonly giftCardService: GiftCardService) {}
 
@@ -86,7 +86,7 @@ export class GiftCardController {
 
   @Get('/download-csv')
   @UsePipes(new ValidationPipe())
-  //   @Roles(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.SUBADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.SUBADMIN)
   async getCsvPath(@Res() response: Response) {
     try {
       const giftCards = await this.giftCardService.getGiftCards()
