@@ -46,6 +46,7 @@
     "class-validator": "^0.13",
     "dotenv": "^8.6.0",
     "express-basic-auth": "^1.2.1",
+    "fast-csv": "^4.3.6",
     "handlebars": "4.7.7",
     "mysql2": "2.3.3",
     "nest-router": "^1.0.9",
