@@ -67,6 +67,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
         io.sockets.in(room).emit('newMessage', message)
 
         client.hSet(room, date, JSON.stringify(message))
+        client.hSet(room, 'latest', JSON.stringify(message))
       })
 
       socket.on('seen', async function(message){
@@ -77,6 +78,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
         io.sockets.in(room).emit('notifySeen', message)
         client.hSet(room, message.date, JSON.stringify(message))
+        client.hSet(room, 'latest', JSON.stringify(message))
   
       })
 
@@ -116,6 +118,10 @@ client.on('error', (err) => console.log('Redis Client Error', err));
     console.log(`Chat server listening on port ${PORT}`)
   })
 
+  app.get("/history", async (request, response ) => {
+   response.send(await client.hGet(request.query.room, 'latest')) 
+  })
+
   function verifyJwtToken(token) {
     try {
       const decoded = jwt.verify(token, 'secret')
@@ -125,4 +131,5 @@ client.on('error', (err) => console.log('Redis Client Error', err));
       return [null, err]
     }
   }
+
 })()
