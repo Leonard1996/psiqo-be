@@ -74,7 +74,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
         const [result, error] = verifyJwtToken(token)
         if (error) return
        
-        const room = result.role === 'patient' ? `${result.id}-${message.seen.receiver}` : `${message.seen.receiver}-${result.id}`
+        // const room = result.role === 'patient' ? `${result.id}-${message.seen.receiver}` : `${message.seen.receiver}-${result.id}`
 
         io.sockets.in(room).emit('notifySeen', message)
         client.hSet(room, message.date, JSON.stringify(message))
@@ -86,7 +86,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
         const [result, error] = verifyJwtToken(token)
         if (error) return
        
-        const room = result.role === 'patient' ? `${result.id}-${message.receiver}` : `${message.receiver}-${result.id}`
+        // const room = result.role === 'patient' ? `${result.id}-${message.receiver}` : `${message.receiver}-${result.id}`
         io.sockets.in(room).emit('showTyping', {isTyping: result.id})
   
       })
@@ -96,7 +96,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
         if (error) return
      
        
-        const room = result.role === 'patient' ? `${result.id}-${message.receiver}` : `${message.receiver}-${result.id}`
+        // const room = result.role === 'patient' ? `${result.id}-${message.receiver}` : `${message.receiver}-${result.id}`
 
         io.sockets.in(room).emit('unshowTyping', {isTyping: result.id})
   

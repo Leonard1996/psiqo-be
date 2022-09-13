@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { RegisterTherapistDto } from '../auth/dto/register-therapist.dto'
 import { Therapist } from 'src/entities/therapist.entity'
 import { Patient } from 'src/entities/patient.entity'
+import { PatientDoctor } from 'src/entities/patient.doctor.entity'
 const crypto = require('crypto')
 
 @Injectable()
@@ -19,6 +20,8 @@ export class UserService {
   private therapistRepository: Repository<Therapist>
   @InjectRepository(Patient)
   private patientRepository: Repository<Patient>
+  @InjectRepository(PatientDoctor)
+  private patientDoctorRepository: Repository<PatientDoctor>
 
   async findOneBy(fieldValue: { [key: string]: string }): Promise<User | undefined> {
     const field = Object.keys(fieldValue)[0]
@@ -121,5 +124,19 @@ export class UserService {
 
   listPatients(id?: number) {
     return this.userRepository.find({ where: { role: 'patient', ...(id && { id }) } })
+  }
+
+  async getPatientsStatistics() {
+    let latestPatientsDoctorsIds = await this.patientDoctorRepository.createQueryBuilder('pd').select('MAX(id) as id, pd.patientId').getRawMany()
+
+    latestPatientsDoctorsIds = latestPatientsDoctorsIds.map((entry) => entry.id)
+
+    return this.userRepository
+      .createQueryBuilder('u')
+      .innerJoinAndSelect('patients', 'p', 'p.userId = u.id')
+      .leftJoinAndSelect('patientsDoctors', 'pd', 'pd.patientId = u.id')
+      .where(`${latestPatientsDoctorsIds.length ? `pd.id In (${latestPatientsDoctorsIds.join(',')})` : true}`)
+      .innerJoinAndSelect('users', 'u2', 'u2.id = pd.doctorId')
+      .getRawMany()
   }
 }

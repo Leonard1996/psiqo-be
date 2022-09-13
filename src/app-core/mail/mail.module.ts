@@ -10,6 +10,7 @@ import { UsersModule } from 'src/app-auth/user/user.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Therapist } from 'src/entities/therapist.entity'
 import { Patient } from 'src/entities/patient.entity'
+import { PatientDoctor } from 'src/entities/patient.doctor.entity'
 
 @Global()
 @Module({
@@ -39,7 +40,7 @@ import { Patient } from 'src/entities/patient.entity'
       inject: [ConfigService],
     }),
     UsersModule,
-    TypeOrmModule.forFeature([User, Therapist, Patient]),
+    TypeOrmModule.forFeature([User, Therapist, Patient, PatientDoctor]),
   ],
   providers: [MailService, ConfigService, UserService],
   exports: [MailService],

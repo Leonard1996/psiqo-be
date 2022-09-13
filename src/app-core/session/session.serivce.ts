@@ -151,8 +151,9 @@ export class SessionService {
   nextSession(patientId: number) {
     return this.sessionRepository
       .createQueryBuilder('s')
-      .select('s.*')
+      .select('s.*, u.name as doctorName')
       .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+      .innerJoin('users', 'u', 'u.id = pd.doctorId')
       .where('pd.patientId = :patientId ', { patientId })
       .andWhere('s.done = :done', { done: false })
       .getRawOne()

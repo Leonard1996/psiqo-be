@@ -1,17 +1,4 @@
-import {
-  Controller,
-  ValidationPipe,
-  UsePipes,
-  Res,
-  Get,
-  UseGuards,
-  Req,
-  HttpStatus,
-  Patch,
-  Body,
-  Param,
-  ParseIntPipe,
-} from '@nestjs/common'
+import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpStatus, Patch, Body, Param, ParseIntPipe } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { UserService } from './user.service'
@@ -135,5 +122,23 @@ export class UserController {
   @Get('consent')
   getFile() {
     return join(process.cwd(), 'src/static-files/consent.pdf')
+  }
+
+  @Get('/patients-statistics')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  @UsePipes(new ValidationPipe())
+  async getPatientsStatistics(@Req() request: Request, @Res() response: Response) {
+    try {
+      const statistics = await this.userService.getPatientsStatistics()
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        statistics,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
   }
 }
