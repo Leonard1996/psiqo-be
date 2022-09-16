@@ -48,6 +48,7 @@ export class OrderController {
         productId,
         price,
       }
+      console.log({ body: request.body })
       // get request body [product id, calcprice, send to paypal, get response, compare, confirm(add credit) ]
       const order = await this.orderService.create(request['user']['id'], createOrderDto, orderId)
       return response.status(HttpStatus.OK).json({

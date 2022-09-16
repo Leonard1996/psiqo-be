@@ -16,13 +16,13 @@ export class OrderService {
   private productService: ProductService
 
   async create(id: number, createOrderDto: CreateOrderDto, orderId: string) {
-    console.log({ id, createOrderDto, orderId })
+    // console.log({ id, createOrderDto, orderId })
     const { productId, price, giftCard, promoCode } = createOrderDto
     const product = await this.productService.getPrice(productId, { giftCard, promoCode })
 
     if (product.price !== price) throw new Exception("Product price doesn't match")
 
-    console.log(await this.paypalCaptureOrder(orderId))
+    // console.log(await this.paypalCaptureOrder(orderId))
   }
 
   async paypalCaptureOrder(orderId: string) {
@@ -30,7 +30,7 @@ export class OrderService {
       data: { access_token: token },
     } = await this.paypalAuth()
 
-    console.log(await this.paypalAuth())
+    // console.log(await this.paypalAuth())
     return axios(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, {
       method: 'post',
       headers: {
