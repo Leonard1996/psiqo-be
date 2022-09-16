@@ -77,7 +77,7 @@ export class SessionService {
     let result: boolean = false
     try {
       await queryRunner.startTransaction()
-      const result = await queryRunner.manager
+      const { affected } = await queryRunner.manager
         .getRepository(User)
         .createQueryBuilder('users')
         .update(User)
@@ -86,7 +86,7 @@ export class SessionService {
         .andWhere('users.credit > 0')
         .execute()
 
-      if (!result.affected) throw new Exception('Not enought credit!')
+      if (!affected) throw new Exception('Not enought credit!')
       // await this.sessionRepository.update({ id: unconfirmedSession.sessionId }, { isConfirmed: true })
 
       await queryRunner.manager
