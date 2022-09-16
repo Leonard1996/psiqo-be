@@ -49,10 +49,10 @@ export class SessionService {
     const undoneSession = await this.sessionRepository.findOne({
       where: {
         patientDoctorId: id,
-        done: true,
+        done: false,
       },
     })
-    if (!undoneSession) throw new BadRequestException('Undone session in queue')
+    if (undoneSession) throw new BadRequestException('Undone session in queue')
     const session = this.sessionRepository.create({ ...createSessionDto, patientDoctorId: id, link: crypto.randomUUID() })
     return this.sessionRepository.save(session)
   }
