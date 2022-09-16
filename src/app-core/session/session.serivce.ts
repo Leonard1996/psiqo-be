@@ -6,6 +6,7 @@ import { CreateSessionDto } from './dto/create.session-dto'
 import { User } from 'src/entities/user.entity'
 import { PatientDoctor } from 'src/entities/patient.doctor.entity'
 import axios from 'axios'
+import { Exception } from 'handlebars'
 const crypto = require('crypto')
 
 @Injectable()
@@ -76,7 +77,7 @@ export class SessionService {
     let result: boolean = false
     try {
       await queryRunner.startTransaction()
-      await queryRunner.manager
+      const result = await queryRunner.manager
         .getRepository(User)
         .createQueryBuilder('users')
         .update(User)
@@ -85,6 +86,7 @@ export class SessionService {
         .andWhere('users.credit > 0')
         .execute()
 
+      if (!result.affected) throw new Exception('Not enought credit!')
       // await this.sessionRepository.update({ id: unconfirmedSession.sessionId }, { isConfirmed: true })
 
       await queryRunner.manager
