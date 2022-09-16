@@ -1,4 +1,4 @@
-import { Controller, ValidationPipe, UsePipes, Res, UseGuards, HttpStatus, Get, Post, Body, Param, ParseIntPipe, Patch } from '@nestjs/common'
+import { Controller, ValidationPipe, UsePipes, Res, UseGuards, HttpStatus, Get, Post, Body, Param, ParseIntPipe, Patch, Req } from '@nestjs/common'
 import { Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from 'src/guards/roles.guard'
@@ -6,6 +6,7 @@ import { Roles } from 'src/decorators/roles.decorator'
 import { CONSTANTS } from 'src/app-auth/common/constants'
 import { ProductService } from './product.service'
 import { CreateProductDto } from './dto/create.product-dto'
+import { PriceDiscountDto } from './dto/price.discount-dto'
 
 @Controller('products')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -72,6 +73,29 @@ export class ProductController {
   async updateProduct(@Res() response: Response, @Param('productId', ParseIntPipe) id: number, @Body() updateProductDto: CreateProductDto) {
     try {
       const product = await this.productService.updateProduct(id, updateProductDto)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        product,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Post('/:productId/price')
+  @UsePipes(new ValidationPipe())
+  @Roles(CONSTANTS.ROLES.PATIENT)
+  async getPrice(
+    @Res() response: Response,
+    @Param('productId', ParseIntPipe) id: number,
+    @Body() priceDiscountDto: PriceDiscountDto,
+    @Req() request: Request,
+  ) {
+    try {
+      const product = await this.productService.getPrice(id, priceDiscountDto)
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Success',

@@ -8,6 +8,7 @@ import { Patient } from './entities/patient.entity'
 import { Product } from './entities/product.entity'
 import { PromoCode } from './entities/promo.code.entity'
 import { GiftCard } from './entities/gift.card.entity'
+import { Order } from './entities/order.entity'
 
 const getConnectionType = (type: any) => {
   switch (type) {
@@ -30,7 +31,7 @@ const ormconfiguration = {
   username: process.env.TYPEORM_USERNAME,
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
-  entities: [User, Therapist, Session, PatientDoctor, Patient, Product, PromoCode, GiftCard],
+  entities: [User, Therapist, Session, PatientDoctor, Patient, Product, PromoCode, GiftCard, Order],
   migrations: [process.env.TYPEORM_MIGRATIONS],
 }
 

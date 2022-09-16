@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { BasicEntity } from './basic.entity'
+import { Order } from './order.entity'
 
 @Entity('products')
 export class Product extends BasicEntity {
@@ -18,7 +19,7 @@ export class Product extends BasicEntity {
   @Column({ type: 'int' })
   price: number
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   tax: number
 
   @Column({ type: 'tinyint' })
@@ -29,4 +30,7 @@ export class Product extends BasicEntity {
 
   @Column({ type: 'timestamp' })
   until: Date
+
+  @OneToMany(() => Order, (order) => order.product)
+  orders: Order[]
 }

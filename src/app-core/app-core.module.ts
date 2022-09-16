@@ -5,6 +5,7 @@ import { UserController } from 'src/app-auth/user/user.controller'
 import { UsersModule } from 'src/app-auth/user/user.module'
 import { UserService } from 'src/app-auth/user/user.service'
 import { GiftCard } from 'src/entities/gift.card.entity'
+import { Order } from 'src/entities/order.entity'
 import { PatientDoctor } from 'src/entities/patient.doctor.entity'
 import { Patient } from 'src/entities/patient.entity'
 import { Product } from 'src/entities/product.entity'
@@ -14,6 +15,9 @@ import { Therapist } from 'src/entities/therapist.entity'
 import { User } from 'src/entities/user.entity'
 import { GiftCardController } from './giftCard/gift.card.controller'
 import { GiftCardService } from './giftCard/gift.card.service'
+import { OrderController } from './order/order.controller'
+import { OrderModule } from './order/order.module'
+import { OrderService } from './order/order.serive'
 import { PatientDoctorController } from './patient-doctor/patient.doctor.controller'
 import { PatientDoctorModule } from './patient-doctor/patient.doctor.module'
 import { PatientDoctorService } from './patient-doctor/patient.doctor.service'
@@ -36,7 +40,8 @@ import { SessionModule } from './session/sessions.module'
     UsersModule,
     SessionModule,
     ProductModule,
-    TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, Product, PromoCode, GiftCard]),
+    OrderModule,
+    TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, Product, PromoCode, GiftCard, Order]),
   ],
   controllers: [
     PatientDoctorController,
@@ -47,7 +52,8 @@ import { SessionModule } from './session/sessions.module'
     ProductController,
     PromoCodeController,
     GiftCardController,
+    OrderController,
   ],
-  providers: [PatientDoctorService, UserService, SessionService, PatientService, ProductService, PromoCodeService, GiftCardService],
+  providers: [PatientDoctorService, UserService, SessionService, PatientService, ProductService, PromoCodeService, GiftCardService, OrderService],
 })
 export class AppCoreModule {}

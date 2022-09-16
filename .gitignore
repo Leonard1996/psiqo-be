@@ -4,6 +4,7 @@
 .package-lock.json
 /crones/node_modules
 /chat/node_modules
+/paypal-ipn/node_modules
 # Logs
 logs
 *.log
