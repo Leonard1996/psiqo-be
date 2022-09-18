@@ -141,4 +141,22 @@ export class UserController {
       })
     }
   }
+
+  @Get('/patients')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  @UsePipes(new ValidationPipe())
+  async get(@Req() request: Request, @Res() response: Response) {
+    try {
+      const patients = await this.userService.listPatients()
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        patients,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
 }
