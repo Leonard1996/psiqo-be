@@ -7,6 +7,8 @@ import * as crypto from 'crypto'
 import { ProductService } from '../product/product.service'
 import { Exception } from 'handlebars'
 import axios from 'axios'
+import { PromoCode } from 'src/entities/promo.code.entity'
+import { GiftCard } from 'src/entities/gift.card.entity'
 
 @Injectable()
 export class OrderService {
@@ -14,15 +16,46 @@ export class OrderService {
   private orderRepository: Repository<Order>
   @Inject(ProductService)
   private productService: ProductService
+  @InjectRepository(PromoCode)
+  private promoCodeRepository: Repository<PromoCode>
+  @InjectRepository(GiftCard)
+  private giftCardRepository: Repository<GiftCard>
 
   async create(id: number, createOrderDto: CreateOrderDto, orderId: string) {
-    // console.log({ id, createOrderDto, orderId })
     const { productId, price, giftCard, promoCode } = createOrderDto
     const product = await this.productService.getPrice(productId, { giftCard, promoCode })
 
-    if (product.price !== price) throw new Exception("Product price doesn't match")
+    if (product?.price !== price) throw new Exception("Product price doesn't match")
 
-    // console.log(await this.paypalCaptureOrder(orderId))
+    if (promoCode) {
+      let unUsedPromoCode = await this.promoCodeRepository.findOne({ where: { code: promoCode, userId: id } })
+      const existingOrder = await this.orderRepository.findOne({ where: { promoCode, userId: id } })
+
+      if (unUsedPromoCode && existingOrder) throw new Exception('Code already used')
+      if (!unUsedPromoCode && existingOrder) throw new Exception('Code already used')
+    }
+
+    if (giftCard) {
+      await this.giftCardRepository.update({ code: giftCard }, { redemptionDate: new Date().toISOString().slice(0, 19).replace('T', ' ') })
+    }
+
+    const result = await this.paypalCaptureOrder(orderId)
+
+    if (+result.data.purchase_units[0].payments.captures[0].seller_receivable_breakdown.gross_amount.value !== price) {
+      throw new Exception('Amount paied does not match product price')
+    }
+
+    const order = this.orderRepository.create({
+      productId,
+      userId: id,
+      details: result.data,
+      ...(giftCard && { giftCard }),
+      ...(promoCode && { promoCode }),
+      paid: +result.data.purchase_units[0].payments.captures[0].seller_receivable_breakdown.gross_amount.value,
+      fee: +result.data.purchase_units[0].payments.captures[0].seller_receivable_breakdown.paypal_fee.value,
+    })
+
+    return this.orderRepository.save(order)
   }
 
   async paypalCaptureOrder(orderId: string) {
@@ -30,7 +63,6 @@ export class OrderService {
       data: { access_token: token },
     } = await this.paypalAuth()
 
-    // console.log(await this.paypalAuth())
     return axios(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, {
       method: 'post',
       headers: {

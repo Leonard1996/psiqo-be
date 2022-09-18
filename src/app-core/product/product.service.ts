@@ -69,9 +69,8 @@ export class ProductService {
         .andWhere('p.until > :endOfDay', { endOfDay: new Date(endOfDay) })
         .andWhere('p.code = :code', { code: priceDiscountDto.promoCode })
         .getOne()
-
       if (promoCode?.percentageDiscount) product.price = product.price - (product.price * promoCode.percentageDiscount) / 100
-      if (promoCode.flatDiscount) product.price = product.price - promoCode.flatDiscount
+      if (promoCode?.flatDiscount) product.price = product.price - promoCode.flatDiscount
     }
 
     if (priceDiscountDto.giftCard) {

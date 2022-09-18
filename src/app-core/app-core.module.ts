@@ -14,6 +14,7 @@ import { Session } from 'src/entities/session.entity'
 import { Therapist } from 'src/entities/therapist.entity'
 import { User } from 'src/entities/user.entity'
 import { GiftCardController } from './giftCard/gift.card.controller'
+import { GiftCardModule } from './giftCard/gift.card.module'
 import { GiftCardService } from './giftCard/gift.card.service'
 import { OrderController } from './order/order.controller'
 import { OrderModule } from './order/order.module'
@@ -27,6 +28,7 @@ import { ProductController } from './product/product.controller'
 import { ProductModule } from './product/product.module'
 import { ProductService } from './product/product.service'
 import { PromoCodeController } from './promoCode/promo.code.controller'
+import { PromoCodeModule } from './promoCode/promo.code.module'
 import { PromoCodeService } from './promoCode/promo.code.service'
 import { SessionController } from './session/session.controller'
 import { SessionCroneController } from './session/session.crone.controller'
@@ -41,6 +43,8 @@ import { SessionModule } from './session/sessions.module'
     SessionModule,
     ProductModule,
     OrderModule,
+    PromoCodeModule,
+    GiftCardModule,
     TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, Product, PromoCode, GiftCard, Order]),
   ],
   controllers: [

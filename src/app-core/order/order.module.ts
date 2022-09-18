@@ -12,10 +12,19 @@ import { Product } from 'src/entities/product.entity'
 import { GiftCard } from 'src/entities/gift.card.entity'
 import { PromoCode } from 'src/entities/promo.code.entity'
 import { Order } from 'src/entities/order.entity'
+import { PromoCodeModule } from '../promoCode/promo.code.module'
+import { GiftCardModule } from '../giftCard/gift.card.module'
+import { OrderService } from './order.serive'
+import { ProductService } from '../product/product.service'
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, Product, GiftCard, PromoCode, Order])],
-  providers: [PatientDoctorService, UserService],
+  imports: [
+    UsersModule,
+    PromoCodeModule,
+    GiftCardModule,
+    TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, Product, GiftCard, PromoCode, Order]),
+  ],
+  providers: [PatientDoctorService, UserService, OrderService, ProductService],
   exports: [PatientDoctorService],
 })
 export class OrderModule {}
