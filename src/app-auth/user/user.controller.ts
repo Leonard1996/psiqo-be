@@ -1,4 +1,4 @@
-import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpStatus, Patch, Body, Param, ParseIntPipe } from '@nestjs/common'
+import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpStatus, Patch, Body, Param, ParseIntPipe, Post } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { UserService } from './user.service'
@@ -153,6 +153,42 @@ export class UserController {
         statusCode: HttpStatus.OK,
         message: 'Success',
         patients,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get('/doctors')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  @UsePipes(new ValidationPipe())
+  async getDoctors(@Req() request: Request, @Res() response: Response) {
+    try {
+      const doctors = await this.userService.listDoctors()
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        doctors,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Post(':id/doctors-rate')
+  // @Roles(CONSTANTS.ROLES.ADMIN)
+  @UsePipes(new ValidationPipe())
+  async setDoctorsRate(@Req() request: Request, @Res() response: Response, @Body() payload: { rate: number }, @Param('id', ParseIntPipe) id: number) {
+    try {
+      const doctor = await this.userService.setDoctorRate(payload, id)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        doctor,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({

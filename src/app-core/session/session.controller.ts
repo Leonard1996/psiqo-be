@@ -239,4 +239,21 @@ export class SessionController {
       })
     }
   }
+
+  @Patch(':id/done')
+  @Roles(CONSTANTS.ROLES.DOCTOR)
+  async done(@Req() request: Request, @Res() response: Response, @Param('id', ParseIntPipe) id: number) {
+    try {
+      const session = await this.sessionService.done(id)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        session,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
 }

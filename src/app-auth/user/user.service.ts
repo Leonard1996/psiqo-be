@@ -241,4 +241,12 @@ export class UserService {
     }
     // console.log({ a: JSON.stringify(usersReport) })
   }
+
+  listDoctors() {
+    return this.userRepository.createQueryBuilder('u').innerJoin('therapists', 't', 't.userId = u.id').getMany()
+  }
+
+  setDoctorRate({ rate }: { rate: number }, userId: number) {
+    return this.therapistRepository.update({ userId: userId }, { rate: rate })
+  }
 }

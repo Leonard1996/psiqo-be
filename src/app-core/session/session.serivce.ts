@@ -35,7 +35,7 @@ export class SessionService {
   getNextConfirmedSession(doctorId: number) {
     return this.sessionRepository
       .createQueryBuilder('s')
-      .select('s.startTime, u.name, u.lastName')
+      .select('s.*')
       .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
       .innerJoin('users', 'u', 'u.id = pd.patientId')
       .where('pd.doctorId = :doctorId', { doctorId })

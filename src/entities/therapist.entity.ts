@@ -19,6 +19,9 @@ export class Therapist extends BasicEntity {
   @Column({ type: 'varchar', nullable: true })
   profilePicture: string
 
+  @Column({ type: 'decimal', precision: 12, scale: 4 })
+  rate: number
+
   @OneToOne(() => User, (user) => user.therapist)
   @JoinColumn()
   user: User
