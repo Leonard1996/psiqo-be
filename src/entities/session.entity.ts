@@ -37,4 +37,7 @@ export class Session extends BasicEntity {
   @Index()
   @Column({ type: 'tinyint', default: false })
   done: boolean
+
+  @Column({ type: 'int', nullable: true })
+  sessionRate: number
 }

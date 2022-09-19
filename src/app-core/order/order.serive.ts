@@ -63,7 +63,6 @@ export class OrderService {
       .update(User)
       .set({ credit: () => `users.credit + ${product.numberOfSessions}` })
       .where('id = :userId', { id })
-      .andWhere('users.credit > 0')
       .execute()
 
     return this.orderRepository.save(order)

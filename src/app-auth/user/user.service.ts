@@ -223,6 +223,13 @@ export class UserService {
         .where('o.userId = :id', { id: user.id })
         .getRawOne()
 
+      const cost = await this.sessionRepository
+        .createQueryBuilder('s')
+        .select('SUM(sessionRate) as amount')
+        .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+        .where('pd.patientId = :id', { id: user.id })
+        .getRawOne()
+
       usersReport.push({
         ...user,
         latestDoctor: userDoctorMap[user.id],
@@ -237,9 +244,11 @@ export class UserService {
         totalMultipleSessionsPurchased,
         giftCardsPurchased,
         revenue,
+        cost,
       })
     }
     // console.log({ a: JSON.stringify(usersReport) })
+    return usersReport
   }
 
   listDoctors() {

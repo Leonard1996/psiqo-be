@@ -7,6 +7,7 @@ import { User } from 'src/entities/user.entity'
 import { PatientDoctor } from 'src/entities/patient.doctor.entity'
 import axios from 'axios'
 import { Exception } from 'handlebars'
+import { Therapist } from 'src/entities/therapist.entity'
 const crypto = require('crypto')
 
 @Injectable()
@@ -19,6 +20,8 @@ export class SessionService {
   private userRepository: Repository<User>
   @InjectRepository(PatientDoctor)
   private patientDoctorRepository: Repository<PatientDoctor>
+  @InjectRepository(Therapist)
+  private therapistRepository: Repository<Therapist>
 
   getDoctorAgenda(doctorId: number, month: number) {
     month = Number(month) || Number(new Date().getMonth() + 1)
@@ -194,7 +197,8 @@ export class SessionService {
     return axios.get(process.env.RTC_TOKEN_LINK + channelName)
   }
 
-  done(id: number) {
-    return this.sessionRepository.update({ id }, { done: true })
+  async done(id: number) {
+    const { rate: sessionRate } = await this.therapistRepository.findOne({ where: { userId: id } })
+    return this.sessionRepository.update({ id }, { done: true, sessionRate })
   }
 }
