@@ -49,8 +49,8 @@ export class User extends BasicEntity {
   @Column({ type: 'int', default: 1 })
   credit: number
 
-  @Column({ type: 'tinyint', default: false })
-  isFormRead: boolean
+  @Column({ type: 'tinyint', default: false, name: 'isFormRead' })
+  solved: boolean
 
   @OneToMany(() => PatientDoctor, (patientDoctor) => patientDoctor.patient)
   patients: PatientDoctor[]
@@ -72,6 +72,9 @@ export class User extends BasicEntity {
 
   @Column({ type: 'tinyint', default: false })
   hasUsedPromoCode: boolean
+
+  @OneToOne(() => Patient, (patient) => patient.user)
+  userAsPatient: Patient
 
   @BeforeInsert()
   generateVerificationCode() {

@@ -193,4 +193,8 @@ export class SessionService {
 
     return axios.get(process.env.RTC_TOKEN_LINK + channelName)
   }
+
+  done(id: number) {
+    return this.sessionRepository.update({ id }, { done: true })
+  }
 }

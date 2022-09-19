@@ -6,6 +6,7 @@ import { Roles } from 'src/decorators/roles.decorator'
 import { CONSTANTS } from 'src/app-auth/common/constants'
 import { GiftCardService } from './gift.card.service'
 import CreateGiftCardDto from './dto/create.gift.card-dto'
+import { MailService } from '../mail/services/mail.service'
 
 @Controller('gift-cards')
 @UseGuards(AuthGuard('jwt'), RolesGuard)

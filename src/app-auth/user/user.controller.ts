@@ -125,7 +125,7 @@ export class UserController {
   }
 
   @Get('/patients-statistics')
-  @Roles(CONSTANTS.ROLES.ADMIN)
+  // @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async getPatientsStatistics(@Req() request: Request, @Res() response: Response) {
     try {
@@ -136,6 +136,7 @@ export class UserController {
         statistics,
       })
     } catch (error) {
+      console.log({ error })
       return response.status(error.statusCode ?? error.status ?? 400).json({
         error,
       })

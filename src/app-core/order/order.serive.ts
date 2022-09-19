@@ -9,6 +9,7 @@ import { Exception } from 'handlebars'
 import axios from 'axios'
 import { PromoCode } from 'src/entities/promo.code.entity'
 import { GiftCard } from 'src/entities/gift.card.entity'
+import { User } from 'src/entities/user.entity'
 
 @Injectable()
 export class OrderService {
@@ -20,6 +21,8 @@ export class OrderService {
   private promoCodeRepository: Repository<PromoCode>
   @InjectRepository(GiftCard)
   private giftCardRepository: Repository<GiftCard>
+  @InjectRepository(User)
+  private userRepository: Repository<User>
 
   async create(id: number, createOrderDto: CreateOrderDto, orderId: string) {
     const { productId, price, giftCard, promoCode } = createOrderDto
@@ -54,6 +57,14 @@ export class OrderService {
       paid: +result.data.purchase_units[0].payments.captures[0].seller_receivable_breakdown.gross_amount.value,
       fee: +result.data.purchase_units[0].payments.captures[0].seller_receivable_breakdown.paypal_fee.value,
     })
+
+    await this.userRepository
+      .createQueryBuilder('users')
+      .update(User)
+      .set({ credit: () => `users.credit + ${product.numberOfSessions}` })
+      .where('id = :userId', { id })
+      .andWhere('users.credit > 0')
+      .execute()
 
     return this.orderRepository.save(order)
   }

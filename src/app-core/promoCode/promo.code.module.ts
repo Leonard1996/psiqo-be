@@ -9,9 +9,10 @@ import { PatientDoctorService } from '../patient-doctor/patient.doctor.service'
 import { Therapist } from 'src/entities/therapist.entity'
 import { Patient } from 'src/entities/patient.entity'
 import { PromoCode } from 'src/entities/promo.code.entity'
+import { Order } from 'src/entities/order.entity'
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, PromoCode])],
+  imports: [UsersModule, TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, PromoCode, Order])],
   providers: [PatientDoctorService, UserService],
   exports: [PatientDoctorService],
 })

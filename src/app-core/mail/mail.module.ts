@@ -11,6 +11,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Therapist } from 'src/entities/therapist.entity'
 import { Patient } from 'src/entities/patient.entity'
 import { PatientDoctor } from 'src/entities/patient.doctor.entity'
+import { SessionModule } from '../session/sessions.module'
+import { Session } from 'src/entities/session.entity'
+import { Order } from 'src/entities/order.entity'
 
 @Global()
 @Module({
@@ -40,7 +43,8 @@ import { PatientDoctor } from 'src/entities/patient.doctor.entity'
       inject: [ConfigService],
     }),
     UsersModule,
-    TypeOrmModule.forFeature([User, Therapist, Patient, PatientDoctor]),
+    SessionModule,
+    TypeOrmModule.forFeature([User, Therapist, Patient, PatientDoctor, Session, Order]),
   ],
   providers: [MailService, ConfigService, UserService],
   exports: [MailService],

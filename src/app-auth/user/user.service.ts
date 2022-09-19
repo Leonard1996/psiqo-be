@@ -10,6 +10,8 @@ import { RegisterTherapistDto } from '../auth/dto/register-therapist.dto'
 import { Therapist } from 'src/entities/therapist.entity'
 import { Patient } from 'src/entities/patient.entity'
 import { PatientDoctor } from 'src/entities/patient.doctor.entity'
+import { Session } from 'src/entities/session.entity'
+import { Order } from 'src/entities/order.entity'
 const crypto = require('crypto')
 
 @Injectable()
@@ -22,6 +24,10 @@ export class UserService {
   private patientRepository: Repository<Patient>
   @InjectRepository(PatientDoctor)
   private patientDoctorRepository: Repository<PatientDoctor>
+  @InjectRepository(Session)
+  private sessionRepository: Repository<Session>
+  @InjectRepository(Order)
+  private orderRepository: Repository<Order>
 
   async findOneBy(fieldValue: { [key: string]: string }): Promise<User | undefined> {
     const field = Object.keys(fieldValue)[0]
@@ -127,16 +133,112 @@ export class UserService {
   }
 
   async getPatientsStatistics() {
-    let latestPatientsDoctorsIds = await this.patientDoctorRepository.createQueryBuilder('pd').select('MAX(id) as id, pd.patientId').getRawMany()
+    const users = await this.userRepository.find({ where: { role: 'patient' }, relations: ['userAsPatient'] })
 
-    latestPatientsDoctorsIds = latestPatientsDoctorsIds.map((entry) => entry.id)
+    const patientsDoctors = await this.patientDoctorRepository.find({ relations: ['doctor'] })
 
-    return this.userRepository
-      .createQueryBuilder('u')
-      .innerJoinAndSelect('patients', 'p', 'p.userId = u.id')
-      .leftJoinAndSelect('patientsDoctors', 'pd', 'pd.patientId = u.id')
-      .where(`${latestPatientsDoctorsIds.length ? `pd.id In (${latestPatientsDoctorsIds.join(',')})` : true}`)
-      .innerJoinAndSelect('users', 'u2', 'u2.id = pd.doctorId')
-      .getRawMany()
+    const userDoctorMap = {}
+    const usersReport = []
+
+    for (const pair of patientsDoctors) {
+      const { patientId, id } = pair
+      if (userDoctorMap[patientId]) {
+        if (userDoctorMap[patientId].id < id && patientId === userDoctorMap[patientId].patientId) {
+          userDoctorMap[patientId] = pair
+        }
+      }
+      if (!userDoctorMap[patientId]) {
+        userDoctorMap[patientId] = pair
+      }
+    }
+
+    for (let user of users) {
+      const doneSessions = await this.sessionRepository
+        .createQueryBuilder('s')
+        .innerJoin('patientsDoctors', 'pd', 's.patientDoctorId = pd.id')
+        .where('done = :done', { done: true })
+        .where('pd.patientId = :id', { id: user.id })
+        .getCount()
+
+      const doneOrders = await this.orderRepository.createQueryBuilder('o').where('o.userId = :id', { id: user.id }).getCount()
+
+      const nextScheduledSession = await this.sessionRepository.findOne({
+        where: {
+          id: user.id,
+          done: false,
+          isConfirmed: false,
+        },
+      })
+
+      const nextConfirmedSession = await this.sessionRepository.findOne({
+        where: {
+          id: user.id,
+          done: false,
+          isConfirmed: true,
+        },
+      })
+
+      const lastDoneSession = await this.sessionRepository
+        .createQueryBuilder('s')
+        .innerJoin('patientsDoctors', 'pd', 's.patientDoctorId = pd.id')
+        .where('done = :done', { done: true })
+        .where('pd.patientId = :id', { id: user.id })
+        .orderBy('s.id', 'DESC')
+        .limit(1)
+        .getOne()
+
+      const lastOrderDone = await this.orderRepository
+        .createQueryBuilder('o')
+        .where('o.userId = :id', { id: user.id })
+        .orderBy('o.id', 'DESC')
+        .limit(1)
+        .getOne()
+
+      const totalSingleSessionsPurchased = await this.orderRepository
+        .createQueryBuilder('o')
+        .select('SUM(numberOfSessions) as amount')
+        .innerJoin('products', 'p', 'p.id = o.productId')
+        .where('p.numberOfSessions = 1')
+        .andWhere('o.userId = :id', { id: user.id })
+        .getRawOne()
+
+      const totalMultipleSessionsPurchased = await this.orderRepository
+        .createQueryBuilder('o')
+        .select('SUM(numberOfSessions) as amount')
+        .innerJoin('products', 'p', 'p.id = o.productId')
+        .where('p.numberOfSessions > 1')
+        .andWhere('o.userId = :id', { id: user.id })
+        .getRawOne()
+
+      const giftCardsPurchased = await this.orderRepository
+        .createQueryBuilder('o')
+        .select('Count(id) as amount')
+        .where('o.userId = :id', { id: user.id })
+        .andWhere('o.giftCard IS NOT NULL')
+        .getRawOne()
+
+      const revenue = await this.orderRepository
+        .createQueryBuilder('o')
+        .select('SUM(paid) as gross, SUM(fee) as tax')
+        .where('o.userId = :id', { id: user.id })
+        .getRawOne()
+
+      usersReport.push({
+        ...user,
+        latestDoctor: userDoctorMap[user.id],
+        doneSessions,
+        doneOrders,
+        nextScheduledSession: nextScheduledSession,
+        nextConfirmedSession,
+        lastDoneSession,
+        lastOrderDone,
+        totalPurchasedSessions: user.credit + doneSessions + (nextConfirmedSession ? 1 : 0),
+        totalSingleSessionsPurchased,
+        totalMultipleSessionsPurchased,
+        giftCardsPurchased,
+        revenue,
+      })
+    }
+    // console.log({ a: JSON.stringify(usersReport) })
   }
 }

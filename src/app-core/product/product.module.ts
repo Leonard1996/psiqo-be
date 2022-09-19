@@ -8,9 +8,10 @@ import { User } from 'src/entities/user.entity'
 import { PatientDoctorService } from '../patient-doctor/patient.doctor.service'
 import { Therapist } from 'src/entities/therapist.entity'
 import { Patient } from 'src/entities/patient.entity'
+import { Order } from 'src/entities/order.entity'
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient])],
+  imports: [UsersModule, TypeOrmModule.forFeature([PatientDoctor, User, Session, Therapist, Patient, Order])],
   providers: [PatientDoctorService, UserService],
   exports: [PatientDoctorService],
 })
