@@ -180,7 +180,7 @@ export class UserController {
   }
 
   @Post(':id/doctors-rate')
-  // @Roles(CONSTANTS.ROLES.ADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async setDoctorsRate(@Req() request: Request, @Res() response: Response, @Body() payload: { rate: number }, @Param('id', ParseIntPipe) id: number) {
     try {
