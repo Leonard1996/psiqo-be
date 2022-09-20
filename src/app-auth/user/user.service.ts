@@ -247,7 +247,6 @@ export class UserService {
         cost,
       })
     }
-    // console.log({ a: JSON.stringify(usersReport) })
     return usersReport
   }
 
@@ -257,5 +256,53 @@ export class UserService {
 
   setDoctorRate({ rate }: { rate: number }, userId: number) {
     return this.therapistRepository.update({ userId: userId }, { rate: rate })
+  }
+
+  async getDoctorsStatistics() {
+    const doctors = await this.userRepository.createQueryBuilder('u').innerJoinAndSelect('u.therapist', 'therapists').getMany()
+    const doctorsData = []
+
+    let singleSessionPatients = await this.sessionRepository
+      .createQueryBuilder('s')
+      .select('Count(s.id) as amount, patientId as id')
+      .innerJoin('patientsDoctors', 'pd', 's.patientDoctorId = pd.id')
+      .groupBy('pd.patientId')
+      .having('amount = 1')
+      .getRawMany()
+
+    singleSessionPatients = singleSessionPatients.map((patient) => patient.id)
+
+    for (const doctor of doctors) {
+      const patients = await this.patientDoctorRepository
+        .createQueryBuilder('pd')
+        .innerJoinAndSelect('pd.patient', 'patient')
+        .where('pd.doctorId = :id', { id: doctor.id })
+        .getMany()
+
+      let nonPagantePatients = 0
+      if (singleSessionPatients.length) {
+        nonPagantePatients = await this.patientDoctorRepository
+          .createQueryBuilder('pd')
+          .where('pd.doctorId = :id', { id: doctor.id })
+          .andWhere('pd.patientId IN (:...singleSessionPatients)', { singleSessionPatients })
+          .getCount()
+      }
+
+      const totalSessionsDoneAndMoneyEarned = await this.sessionRepository
+        .createQueryBuilder('s')
+        .select('COUNT(s.id) as numberOfSessions, SUM(s.sessionRate) as totalMoneyEarned')
+        .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+        .where('pd.doctorId = :id', { id: doctor.id })
+        .andWhere('s.done = :done', { done: true })
+        .getRawOne()
+
+      doctorsData.push({
+        ...doctor,
+        patients,
+        nonPagantePatients,
+        totalSessionsDoneAndMoneyEarned,
+      })
+    }
+    return doctorsData
   }
 }
