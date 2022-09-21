@@ -130,6 +130,6 @@ app.get("/test-mysql", async (request, response ) => {
 
 
 app.listen(process.env.PORT, () => {
-  console.log(`Crone server starting on port: ${process.env.PORT}`)
+  console.log(`Crone server starting on port: ${process.env.PORT} at ${new Date().toISOString().slice(0, 19).replace('T', ' ') }`)
 })
 
