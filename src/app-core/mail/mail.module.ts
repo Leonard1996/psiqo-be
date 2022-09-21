@@ -33,7 +33,7 @@ import { Order } from '../../entities/order.entity'
           from: `"No Reply" <${config.get('MAIL_FROM')}>`,
         },
         template: {
-          dir: join(__dirname, './templates'),
+          dir: join(__dirname, '../../app-core/mail/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: false,

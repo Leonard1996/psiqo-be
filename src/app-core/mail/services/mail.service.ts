@@ -4,6 +4,7 @@ import { User } from '../../../entities/user.entity'
 import { ConfigService } from '@nestjs/config'
 import { PromoCode } from '../../../entities/promo.code.entity'
 import { UserService } from '../../../app-auth/user/user.service'
+import { join } from 'path'
 
 @Injectable()
 export class MailService {
@@ -16,11 +17,10 @@ export class MailService {
 
   async sendUserValidation({ email, name, verificationCode }: User) {
     const url = `${this.configService.get('FRONTEND_URL')}/validate?email=${email}`
-
     await this.mailerService.sendMail({
       to: email,
       subject: 'Welcome to Psiqo! Please validate your account',
-      template: '/confirmation',
+      template: 'confirmation',
       context: {
         name: this.initialToUpperCase(name),
         url,
@@ -35,7 +35,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: `Psiqo session invitation with ${this.initialToUpperCase(doctorName)}`,
-      template: '/session-validation',
+      template: 'session-validation',
       context: {
         name: this.initialToUpperCase(name),
         url,
@@ -52,7 +52,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: `Psiqo video call session link`,
-      template: '/session-link',
+      template: 'session-link',
       context: {
         name: this.initialToUpperCase(name),
         url,
@@ -66,7 +66,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: `Psiqo video call session reminder`,
-      template: '/confirmed-session-reminder',
+      template: 'confirmed-session-reminder',
       context: {
         name: this.initialToUpperCase(name),
         url,
@@ -80,7 +80,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: sessionDetails.email,
       subject: `Psiqo session canceled!`,
-      template: '/session-cancel',
+      template: 'session-cancel',
       context: {
         name: this.initialToUpperCase(sessionDetails.name),
         startTime: sessionDetails.startTime,
@@ -101,7 +101,7 @@ export class MailService {
       return this.mailerService.sendMail({
         to: patient.email,
         subject: `Psiqo promo code!`,
-        template: '/promo-code',
+        template: 'promo-code',
         context: {
           name: this.initialToUpperCase(patient.name),
           promoCode,
