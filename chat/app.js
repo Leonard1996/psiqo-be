@@ -115,7 +115,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
   const PORT = process.env.PORT || 4999
 
   server.listen(PORT, () => {
-    console.log(`Chat server listening on port ${PORT}`)
+    console.log(`Chat server listening on port ${PORT} at ${new Date().toISOString().slice(0, 19).replace('T', ' ')}`)
   })
 
   app.get("/history", async (request, response ) => {
