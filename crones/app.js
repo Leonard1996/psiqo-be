@@ -120,7 +120,16 @@ app.get("/crones/clean-up", (req, res) => {
   res.sendStatus(200)
 })
 
+app.get("/test-mysql", async (request, response ) => {
+  connection.query('SELECT 1 + 1 AS WORKS', function (error, results, fields) {
+    if (error) throw error;
+    console.log('The solution is: ', );
+    response.send(results[0].solution) 
+  });
+ })
+
 
 app.listen(process.env.PORT, () => {
   console.log(`Crone server starting on port: ${process.env.PORT}`)
 })
+

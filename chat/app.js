@@ -122,6 +122,11 @@ client.on('error', (err) => console.log('Redis Client Error', err));
    response.send(await client.hGet(request.query.room, 'latest')) 
   })
 
+  app.get("/test", async (request, response ) => {
+    await client.set('test', 'it works');
+    response.send(await client.get('test')) 
+   })
+
   function verifyJwtToken(token) {
     try {
       const decoded = jwt.verify(token, 'secret')
