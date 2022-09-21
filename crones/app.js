@@ -121,7 +121,7 @@ app.get("/crones/clean-up", (req, res) => {
 })
 
 app.get("/test-mysql", async (request, response ) => {
-  connection.query('SELECT * from users', function (error, results, fields) {
+  connection.query('SELECT * from giftCards', function (error, results, fields) {
     if (error) throw error;
     console.log('The solution is: ', JSON.stringify(results));
     return response.send({results})
