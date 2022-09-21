@@ -88,12 +88,7 @@ export class ProductController {
   @Post('/:productId/price')
   @UsePipes(new ValidationPipe())
   @Roles(CONSTANTS.ROLES.PATIENT)
-  async getPrice(
-    @Res() response: Response,
-    @Param('productId', ParseIntPipe) id: number,
-    @Body() priceDiscountDto: PriceDiscountDto,
-    @Req() request: Request,
-  ) {
+  async getPrice(@Res() response: Response, @Param('productId', ParseIntPipe) id: number, @Body() priceDiscountDto: PriceDiscountDto) {
     try {
       const product = await this.productService.getPrice(id, priceDiscountDto)
       return response.status(HttpStatus.OK).json({
