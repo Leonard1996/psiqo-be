@@ -198,7 +198,7 @@ export class UserController {
   }
 
   @Get('/doctors-statistics')
-  @Roles(CONSTANTS.ROLES.ADMIN)
+  // @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async getDoctorsStatistics(@Req() request: Request, @Res() response: Response) {
     try {

@@ -262,15 +262,28 @@ export class UserService {
     const doctors = await this.userRepository.createQueryBuilder('u').innerJoinAndSelect('u.therapist', 'therapists').getMany()
     const doctorsData = []
 
-    let singleSessionPatients = await this.sessionRepository
+    const singleSessionPatients = await this.sessionRepository
       .createQueryBuilder('s')
-      .select('Count(s.id) as amount, patientId as id')
-      .innerJoin('patientsDoctors', 'pd', 's.patientDoctorId = pd.id')
-      .groupBy('pd.patientId')
+      .select('Count(s.id) as amount, pd.patientId, pd.doctorId')
+      .innerJoin('patientsDoctors', 'pd', 'pd.id = s.patientDoctorId')
+      .where(
+        `patientId NOT IN 
+        (select patientId from patientsDoctors 
+        join sessions on patientsDoctors.id = sessions.patientDoctorId
+        where patientsDoctors.doctorId!=pd.doctorId)`,
+      )
+      .groupBy('pd.patientId, pd.doctorId')
       .having('amount = 1')
       .getRawMany()
 
-    singleSessionPatients = singleSessionPatients.map((patient) => patient.id)
+    const nonPagantePatients = {}
+
+    for (const patient of singleSessionPatients) {
+      if (!nonPagantePatients[patient.doctorId]) {
+        nonPagantePatients[patient.doctorId] = 0
+      }
+      nonPagantePatients[patient.doctorId] = +1
+    }
 
     for (const doctor of doctors) {
       const patients = await this.patientDoctorRepository
@@ -278,15 +291,6 @@ export class UserService {
         .innerJoinAndSelect('pd.patient', 'patient')
         .where('pd.doctorId = :id', { id: doctor.id })
         .getMany()
-
-      let nonPagantePatients = 0
-      if (singleSessionPatients.length) {
-        nonPagantePatients = await this.patientDoctorRepository
-          .createQueryBuilder('pd')
-          .where('pd.doctorId = :id', { id: doctor.id })
-          .andWhere('pd.patientId IN (:...singleSessionPatients)', { singleSessionPatients })
-          .getCount()
-      }
 
       const totalSessionsDoneAndMoneyEarned = await this.sessionRepository
         .createQueryBuilder('s')
@@ -299,7 +303,7 @@ export class UserService {
       doctorsData.push({
         ...doctor,
         patients,
-        nonPagantePatients,
+        nonPagantePatients: nonPagantePatients[doctor.id] ?? 0,
         totalSessionsDoneAndMoneyEarned,
       })
     }
