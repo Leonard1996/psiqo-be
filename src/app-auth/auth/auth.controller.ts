@@ -5,7 +5,7 @@ import { Response, Request } from 'express'
 import { RegisterDto } from './dto/register.dto'
 import { VerificationDto } from './dto/verification.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
-import global from 'src/global/file-config'
+import global from '../../global/file-config'
 import { UserService } from '../user/user.service'
 import { ROLES } from '../common/constants'
 

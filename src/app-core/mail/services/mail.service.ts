@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { MailerService } from '@nestjs-modules/mailer'
-import { User } from 'src/entities/user.entity'
+import { User } from '../../../entities/user.entity'
 import { ConfigService } from '@nestjs/config'
-import { PromoCode } from 'src/entities/promo.code.entity'
-import { UserService } from 'src/app-auth/user/user.service'
-import { PatientService } from 'src/app-core/patient/patient.service'
+import { PromoCode } from '../../../entities/promo.code.entity'
+import { UserService } from '../../../app-auth/user/user.service'
 
 @Injectable()
 export class MailService {

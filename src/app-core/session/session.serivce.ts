@@ -1,13 +1,13 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common'
 import { Connection, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Session } from 'src/entities/session.entity'
+import { Session } from '../../entities/session.entity'
 import { CreateSessionDto } from './dto/create.session-dto'
-import { User } from 'src/entities/user.entity'
-import { PatientDoctor } from 'src/entities/patient.doctor.entity'
+import { User } from '../../entities/user.entity'
+import { PatientDoctor } from '../../entities/patient.doctor.entity'
 import axios from 'axios'
 import { Exception } from 'handlebars'
-import { Therapist } from 'src/entities/therapist.entity'
+import { Therapist } from '../../entities/therapist.entity'
 const crypto = require('crypto')
 
 @Injectable()

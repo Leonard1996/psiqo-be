@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Response } from 'express'
-import { GiftCard } from 'src/entities/gift.card.entity'
+import { GiftCard } from '../../entities/gift.card.entity'
 import { Repository } from 'typeorm'
 import CreateGiftCardDto from './dto/create.gift.card-dto'
 const { writeToPath } = require('@fast-csv/format')

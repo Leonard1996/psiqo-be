@@ -18,16 +18,15 @@ import {
 } from '@nestjs/common'
 import { Response, Request } from 'express'
 import { AuthGuard } from '@nestjs/passport'
-import { RolesGuard } from 'src/guards/roles.guard'
-import { Roles } from 'src/decorators/roles.decorator'
-import { CONSTANTS } from 'src/app-auth/common/constants'
+import { RolesGuard } from '../../guards/roles.guard'
+import { Roles } from '../../decorators/roles.decorator'
+import { CONSTANTS } from '../../app-auth/common/constants'
 import { SessionService } from './session.serivce'
 import { CreateSessionDto } from './dto/create.session-dto'
 import { MailService } from '../mail/services/mail.service'
 import { PatientDoctorService } from '../patient-doctor/patient.doctor.service'
 import { SessionCreatedEventService } from './session.created.event.service'
 import { SERVER_SENT_EVENT_TYPE } from '../common/server.sent.event.types'
-import { channel } from 'diagnostics_channel'
 const axios = require('axios').default
 
 @Controller('sessions')

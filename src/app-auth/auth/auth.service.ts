@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt'
 import { UserService } from '../user/user.service'
 import { RegisterDto } from './dto/register.dto'
 import { VerificationDto } from './dto/verification.dto'
-import { MailService } from 'src/app-core/mail/services/mail.service'
+import { MailService } from '../../app-core/mail/services/mail.service'
 const crypto = require('crypto')
 
 @Injectable()

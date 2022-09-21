@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { PromoCode } from 'src/entities/promo.code.entity'
+import { PromoCode } from '../../entities/promo.code.entity'
 import { Connection, Repository } from 'typeorm'
 import { CreatePromoCodeDto } from './dto/promo.code-dto'
 import { UpdatePromoCodeDto } from './dto/update.promo.code-dto'

@@ -1,9 +1,9 @@
 import { Controller, ValidationPipe, UsePipes, Res, UseGuards, HttpStatus, Body, Post, Param, ParseIntPipe, Delete, Req, Get } from '@nestjs/common'
 import { Response, Request } from 'express'
 import { AuthGuard } from '@nestjs/passport'
-import { RolesGuard } from 'src/guards/roles.guard'
-import { Roles } from 'src/decorators/roles.decorator'
-import { CONSTANTS } from 'src/app-auth/common/constants'
+import { RolesGuard } from '../../guards/roles.guard'
+import { Roles } from '../../decorators/roles.decorator'
+import { CONSTANTS } from '../../app-auth/common/constants'
 import { CreatePatientDoctorDto } from './dto/create-patient-doctor.dto'
 import { PatientDoctorService } from './patient.doctor.service'
 

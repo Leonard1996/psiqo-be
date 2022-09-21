@@ -2,10 +2,10 @@ import { Controller, ValidationPipe, UsePipes, Res, Get, UseGuards, Req, HttpSta
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { UserService } from './user.service'
-import { RolesGuard } from 'src/guards/roles.guard'
+import { RolesGuard } from '../../guards/roles.guard'
 import { UpdateMeDto } from './dto/update-me.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { Roles } from 'src/decorators/roles.decorator'
+import { Roles } from '../../decorators/roles.decorator'
 import { CONSTANTS } from '../common/constants'
 import { join } from 'path'
 
@@ -121,7 +121,7 @@ export class UserController {
 
   @Get('consent')
   getFile() {
-    return join(process.cwd(), 'src/static-files/consent.pdf')
+    return join(process.cwd(), '../../static-files/consent.pdf')
   }
 
   @Get('/patients-statistics')

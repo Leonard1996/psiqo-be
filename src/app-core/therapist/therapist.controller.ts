@@ -1,9 +1,6 @@
-import { Controller, ValidationPipe, UsePipes, Res, UseGuards, HttpStatus, Get, Param, ParseIntPipe, Query } from '@nestjs/common'
-import { Response, Request } from 'express'
+import { Controller, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
-import { RolesGuard } from 'src/guards/roles.guard'
-import { Roles } from 'src/decorators/roles.decorator'
-import { CONSTANTS } from 'src/app-auth/common/constants'
+import { RolesGuard } from '../../guards/roles.guard'
 
 @Controller('therapists')
 @UseGuards(AuthGuard('jwt'), RolesGuard)

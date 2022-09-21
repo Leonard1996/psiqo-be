@@ -16,12 +16,12 @@ import {
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
-import { RolesGuard } from 'src/guards/roles.guard'
-import { Roles } from 'src/decorators/roles.decorator'
+import { RolesGuard } from '../../guards/roles.guard'
+import { Roles } from '../../decorators/roles.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { CONSTANTS } from 'src/app-auth/common/constants'
+import { CONSTANTS } from '../../app-auth/common/constants'
 
-import global from 'src/global/file-config'
+import global from '../../global/file-config'
 import { OrderService } from './order.serive'
 import { CreateOrderDto } from './dto/create.order-dto'
 

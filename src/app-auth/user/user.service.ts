@@ -7,11 +7,11 @@ import { VerificationDto } from '../auth/dto/verification.dto'
 import { UpdateMeDto } from './dto/update-me.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { RegisterTherapistDto } from '../auth/dto/register-therapist.dto'
-import { Therapist } from 'src/entities/therapist.entity'
-import { Patient } from 'src/entities/patient.entity'
-import { PatientDoctor } from 'src/entities/patient.doctor.entity'
-import { Session } from 'src/entities/session.entity'
-import { Order } from 'src/entities/order.entity'
+import { Therapist } from '../../entities/therapist.entity'
+import { Patient } from '../../entities/patient.entity'
+import { PatientDoctor } from '../../entities/patient.doctor.entity'
+import { Session } from '../../entities/session.entity'
+import { Order } from '../../entities/order.entity'
 const crypto = require('crypto')
 
 @Injectable()

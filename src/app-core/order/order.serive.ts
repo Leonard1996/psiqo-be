@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Order } from 'src/entities/order.entity'
+import { Order } from '../../entities/order.entity'
 import { CreateOrderDto } from './dto/create.order-dto'
 import * as crypto from 'crypto'
 import { ProductService } from '../product/product.service'
 import { Exception } from 'handlebars'
 import axios from 'axios'
-import { PromoCode } from 'src/entities/promo.code.entity'
-import { GiftCard } from 'src/entities/gift.card.entity'
-import { User } from 'src/entities/user.entity'
+import { PromoCode } from '../../entities/promo.code.entity'
+import { GiftCard } from '../../entities/gift.card.entity'
+import { User } from '../../entities/user.entity'
 
 @Injectable()
 export class OrderService {
