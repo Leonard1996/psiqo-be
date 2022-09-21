@@ -6,6 +6,7 @@ function createConnection(host, user, database, password) {
     user,
     database,
     password,
+    port:3306
   });
 }
 
