@@ -124,9 +124,7 @@ app.get("/test-mysql", async (request, response ) => {
   connection.query('SELECT 1 + 1 AS works', function (error, results, fields) {
     if (error) throw error;
     console.log('The solution is: ', JSON.stringify(results));
-    response.sendStatus(200).json({
-      results
-    })
+    return response.send({results})
   });
  })
 
