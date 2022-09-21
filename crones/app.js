@@ -121,7 +121,7 @@ app.get("/crones/clean-up", (req, res) => {
 })
 
 app.get("/test-mysql", async (request, response ) => {
-  connection.query('SELECT 1 + 1 AS WORKS', function (error, results, fields) {
+  connection.query('SELECT 1 + 1 AS works', function (error, results, fields) {
     if (error) throw error;
     console.log('The solution is: ', JSON.stringify(results));
     response.send(results[0].works) 
