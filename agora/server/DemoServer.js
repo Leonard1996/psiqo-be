@@ -5,14 +5,14 @@ var http = require('http');
 var express = require('express');
 var {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
 
-var PORT = 8080;
+var PORT = 5002;
 
 // Fill the appID and appCertificate key given by Agora.io
-var appID = "c79b07fb26554e3bbf457935c0e6f21a";
-var appCertificate = "9d0ee9a730d54d0d993dc4cbedd48186";
+var appID = "34e9cd210fd64268ae1f930832c60356";
+var appCertificate = "32046fa725594aaeb3fd474028e34c50";
 
 // token expire time, hardcode to 3600 seconds = 1 hour
-var expirationTimeInSeconds = 3600
+var expirationTimeInSeconds = 7200
 var role = RtcRole.PUBLISHER
 
 var app = express();
