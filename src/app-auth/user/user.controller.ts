@@ -197,7 +197,7 @@ export class UserController {
   }
 
   @Get('/doctors-statistics')
-  // @Roles(CONSTANTS.ROLES.ADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async getDoctorsStatistics(@Req() request: Request, @Res() response: Response) {
     try {
@@ -209,6 +209,24 @@ export class UserController {
       })
     } catch (error) {
       console.log({ error })
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get('')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  @UsePipes(new ValidationPipe())
+  async getUsers(@Req() request: Request, @Res() response: Response) {
+    try {
+      const users = await this.userService.listUsers(request['user']['id'])
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        users,
+      })
+    } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({
         error,
       })

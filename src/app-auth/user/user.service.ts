@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { Not, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from '../../entities/user.entity'
 import { RegisterDto } from '../auth/dto/register.dto'
@@ -308,5 +308,9 @@ export class UserService {
       })
     }
     return doctorsData
+  }
+
+  listUsers(id: number) {
+    return this.userRepository.find({ where: { id: Not(id) } })
   }
 }
