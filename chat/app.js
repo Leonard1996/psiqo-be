@@ -129,7 +129,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
   function verifyJwtToken(token) {
     try {
-      const decoded = jwt.verify(token, 'secret')
+      const decoded = jwt.verify(token, '!secret@P_siqo2022$')
       return [decoded, null]
     } catch (err) {
       console.log({ err })
