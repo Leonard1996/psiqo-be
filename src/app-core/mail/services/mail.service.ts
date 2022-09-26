@@ -30,7 +30,7 @@ export class MailService {
   }
 
   async sendSessionValidation(doctorName: string, { email, id, name }: { email: string; id: number; name: string }, startTime: Date, endTime: Date) {
-    const url = `${this.configService.get('FRONTEND_URL')}/profile/${id}`
+    const url = `${this.configService.get('FRONTEND_URL')}/dashboard`
 
     await this.mailerService.sendMail({
       to: email,
