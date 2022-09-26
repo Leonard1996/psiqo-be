@@ -53,7 +53,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
       const [result, error] = verifyJwtToken(token)
       console.log("in create")
       if (error) return
-      if (!room.split('').includes(result.id.toString())) return
+      if (!room.split('-').includes(result.id.toString())) return
       socket.join(room)
 
       io.sockets.in(room).emit('roomCreated')
