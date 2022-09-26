@@ -41,7 +41,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
       const room = result.role === 'patient' ? `${result.id}-${receiver}` : `${receiver}-${result.id}`
 
       const existingChat = await client.hGetAll(room)
-
+      console.log({existingChat})
       for (const value in existingChat) {
         existingChat[value] = JSON.parse(existingChat[value])
       }
@@ -51,6 +51,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
     socket.on('create', async function (room) {
       const [result, error] = verifyJwtToken(token)
+      console.log("in create")
       if (error) return
       if (!room.split('').includes(result.id.toString())) return
       socket.join(room)
@@ -59,10 +60,12 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
       socket.on('createMessage', async function (message) {
         const [result, error] = verifyJwtToken(token)
+        console.log("in create message")
         if (error) return
-      
+         console.log("here")
         const date = Date.now()
         message = {...message, date }
+        console.log({message})
 
         io.sockets.in(room).emit('newMessage', message)
 
