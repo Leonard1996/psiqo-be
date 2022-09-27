@@ -14,7 +14,7 @@ export class PatientDoctorController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  @Roles(CONSTANTS.ROLES.SUBADMIN)
+  @Roles(CONSTANTS.ROLES.SUBADMIN, CONSTANTS.ROLES.ADMIN)
   async create(@Body() createPatientDoctorDto: CreatePatientDoctorDto, @Res() response: Response) {
     try {
       const patientDoctor = await this.patientDoctorService.create(createPatientDoctorDto)

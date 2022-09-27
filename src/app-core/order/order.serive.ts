@@ -62,7 +62,7 @@ export class OrderService {
       .createQueryBuilder('users')
       .update(User)
       .set({ credit: () => `users.credit + ${product.numberOfSessions}` })
-      .where('id = :userId', { id })
+      .where('id = :id', { id })
       .execute()
 
     return this.orderRepository.save(order)
@@ -73,7 +73,7 @@ export class OrderService {
       data: { access_token: token },
     } = await this.paypalAuth()
 
-    return axios(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, {
+    return axios(process.env.PAYPAL_BASE_API + `/v2/checkout/orders/${orderId}/capture`, {
       method: 'post',
       headers: {
         'content-type': 'application/json',

@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { BasicEntity } from './basic.entity'
 import { Product } from './product.entity'
 import { User } from './user.entity'
