@@ -96,4 +96,8 @@ export class OrderService {
       },
     })
   }
+
+  getByUserId(userId: number) {
+    return this.orderRepository.find({ where: { userId } })
+  }
 }

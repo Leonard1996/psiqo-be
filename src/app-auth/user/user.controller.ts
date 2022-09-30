@@ -232,4 +232,22 @@ export class UserController {
       })
     }
   }
+
+  @Patch('/doctors/:id')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  @UsePipes(new ValidationPipe())
+  async updateDoctor(@Param('id', ParseIntPipe) id: number, @Res() response: Response, @Body() payload: any) {
+    try {
+      const doctor = await this.userService.updateDoctor(id, payload)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        doctor,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
 }

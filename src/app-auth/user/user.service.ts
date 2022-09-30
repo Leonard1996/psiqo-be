@@ -313,4 +313,16 @@ export class UserService {
   listUsers(id: number) {
     return this.userRepository.find({ where: { id: Not(id) } })
   }
+
+  async updateDoctor(id: number, payload: any) {
+    let doctor = await this.userRepository.findOne({ where: { id }, relations: ['therapist'] })
+    doctor = this.userRepository.merge(doctor as any, payload) as any
+    let therapist = this.therapistRepository.merge(doctor.therapist, payload)
+    doctor = await this.userRepository.save(doctor)
+    therapist = await this.therapistRepository.save(therapist)
+    return {
+      ...doctor,
+      therapist,
+    }
+  }
 }

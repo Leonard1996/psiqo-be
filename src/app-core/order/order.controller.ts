@@ -1,27 +1,9 @@
-import {
-  Controller,
-  Res,
-  UseGuards,
-  HttpStatus,
-  Post,
-  UseInterceptors,
-  UploadedFile,
-  Req,
-  Get,
-  Patch,
-  Param,
-  ParseIntPipe,
-  Body,
-  Query,
-} from '@nestjs/common'
+import { Controller, Res, UseGuards, HttpStatus, Post, Req, Get, Param, ParseIntPipe, Query } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '../../guards/roles.guard'
 import { Roles } from '../../decorators/roles.decorator'
-import { FileInterceptor } from '@nestjs/platform-express'
 import { CONSTANTS } from '../../app-auth/common/constants'
-
-import global from '../../global/file-config'
 import { OrderService } from './order.serive'
 import { CreateOrderDto } from './dto/create.order-dto'
 
@@ -53,6 +35,23 @@ export class OrderController {
         statusCode: HttpStatus.OK,
         message: 'Consent updated successfully',
         order,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get('')
+  @Roles(CONSTANTS.ROLES.PATIENT)
+  async getByUserId(@Req() request: Request, @Res() response: Response) {
+    try {
+      const orders = await this.orderService.getByUserId(request['user']['id'])
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Consent updated successfully',
+        orders,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({

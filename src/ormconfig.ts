@@ -31,6 +31,7 @@ const ormconfiguration = {
   username: process.env.TYPEORM_USERNAME,
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
+  timezone: 'Z',
   entities: [User, Therapist, Session, PatientDoctor, Patient, Product, PromoCode, GiftCard, Order],
   migrations: [process.env.TYPEORM_MIGRATIONS],
 }
