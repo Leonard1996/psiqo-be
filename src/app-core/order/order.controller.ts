@@ -59,4 +59,21 @@ export class OrderController {
       })
     }
   }
+
+  @Get('')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  async getOrders(@Req() request: Request, @Res() response: Response) {
+    try {
+      const orders = await this.orderService.getOrders()
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Consent updated successfully',
+        orders,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
 }
