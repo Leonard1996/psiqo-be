@@ -125,7 +125,7 @@ export class UserController {
   }
 
   @Get('/patients-statistics')
-  // @Roles(CONSTANTS.ROLES.ADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async getPatientsStatistics(@Req() request: Request, @Res() response: Response) {
     try {
@@ -239,6 +239,24 @@ export class UserController {
   async updateDoctor(@Param('id', ParseIntPipe) id: number, @Res() response: Response, @Body() payload: any) {
     try {
       const doctor = await this.userService.updateDoctor(id, payload)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        doctor,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Patch('/associate/:id')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  @UsePipes(new ValidationPipe())
+  async associate(@Param('id', ParseIntPipe) id: number, @Res() response: Response, @Body() payload: any) {
+    try {
+      const doctor = await this.userService.associate(id)
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Success',

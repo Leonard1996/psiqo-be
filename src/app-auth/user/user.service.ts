@@ -325,4 +325,16 @@ export class UserService {
       therapist,
     }
   }
+
+  async associate(id: number) {
+    const user = await this.userRepository.findOneOrFail({ where: { id } })
+    const toJoin = user.role === 'patient' ? 'patientId' : 'doctorId'
+    const toGet = user.role !== 'patient' ? 'patientId' : 'doctorId'
+
+    return this.userRepository
+      .createQueryBuilder('u')
+      .innerJoin('patientsDoctors', 'pd', `pd.${toGet} = u.id`)
+      .where(`pd.${toJoin} = :id`, { id })
+      .getMany()
+  }
 }
