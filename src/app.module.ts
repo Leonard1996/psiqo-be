@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
+import { join } from 'path'
 import { AppAuthModule } from './app-auth/app-auth.module'
 import { AppCoreModule } from './app-core/app-core.module'
 import { MailModule } from './app-core/mail/mail.module'
@@ -20,4 +21,4 @@ import { ormconfiguration } from './ormconfig'
   controllers: [AppController],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

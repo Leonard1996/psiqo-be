@@ -121,11 +121,11 @@ export class UserController {
 
   @Get('consent')
   getFile() {
-    return join(process.cwd(), '../../static-files/consent.pdf')
+    return join(process.cwd(), '../../files/consent.pdf')
   }
 
   @Get('/patients-statistics')
-  @Roles(CONSTANTS.ROLES.ADMIN)
+  // @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async getPatientsStatistics(@Req() request: Request, @Res() response: Response) {
     try {

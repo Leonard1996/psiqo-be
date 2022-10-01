@@ -16,7 +16,7 @@ export class MailService {
   private initialToUpperCase = (name: string) => name.charAt(0).toLocaleUpperCase() + name.slice(1)
 
   async sendUserValidation({ email, name, verificationCode }: User) {
-    const url = `${this.configService.get('FRONTEND_URL')}/validate?email=${email}`
+    const url = `${this.configService.get('FRONTEND_URL')}/validate-user?email=${email}`
     await this.mailerService.sendMail({
       to: email,
       subject: 'Welcome to Psiqo! Please validate your account',
