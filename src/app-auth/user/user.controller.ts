@@ -251,16 +251,16 @@ export class UserController {
     }
   }
 
-  @Patch('/associate/:id')
+  @Patch(':id/associates')
   @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async associate(@Param('id', ParseIntPipe) id: number, @Res() response: Response, @Body() payload: any) {
     try {
-      const associations = await this.userService.associate(id)
+      const associates = await this.userService.associate(id)
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Success',
-        associations,
+        associates,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({
