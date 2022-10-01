@@ -44,10 +44,10 @@ export class OrderController {
   }
 
   @Get('')
-  @Roles(CONSTANTS.ROLES.PATIENT)
-  async getByUserId(@Req() request: Request, @Res() response: Response) {
+  @Roles(CONSTANTS.ROLES.PATIENT, CONSTANTS.ROLES.ADMIN)
+  async getByUserId(@Req() request: Request, @Res() response: Response, @Query('id') id?: number) {
     try {
-      const orders = await this.orderService.getByUserId(request['user']['id'])
+      const orders = await this.orderService.getByUserId(id ?? request['user']['id'])
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Consent updated successfully',
