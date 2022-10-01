@@ -251,7 +251,7 @@ export class UserController {
     }
   }
 
-  @Patch(':id/associates')
+  @Get(':id/associates')
   @Roles(CONSTANTS.ROLES.ADMIN)
   @UsePipes(new ValidationPipe())
   async associate(@Param('id', ParseIntPipe) id: number, @Res() response: Response, @Body() payload: any) {
