@@ -60,7 +60,7 @@ export class OrderController {
     }
   }
 
-  @Get('')
+  @Get('/all')
   @Roles(CONSTANTS.ROLES.ADMIN)
   async getOrders(@Req() request: Request, @Res() response: Response) {
     try {
