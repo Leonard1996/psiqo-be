@@ -102,6 +102,6 @@ export class OrderService {
   }
 
   getOrders() {
-    return this.orderRepository.find()
+    return this.orderRepository.find({ relations: ['user'] })
   }
 }
