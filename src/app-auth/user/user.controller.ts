@@ -256,11 +256,11 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   async associate(@Param('id', ParseIntPipe) id: number, @Res() response: Response, @Body() payload: any) {
     try {
-      const doctor = await this.userService.associate(id)
+      const associations = await this.userService.associate(id)
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Success',
-        doctor,
+        associations,
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({
