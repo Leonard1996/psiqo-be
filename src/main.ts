@@ -11,10 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
   app.useStaticAssets(join(__dirname, '..', 'files'))
   app.use(localAuthMiddleware)
-  app.enableCors({
-    origin: 'http://ec2-34-244-164-93.eu-west-1.compute.amazonaws.com:4500',
-    credentials: true,
-  })
+  app.enableCors()
 
   await app.listen(PORT)
   console.log(`Listening at: http://localhost:${process.env.PORT}`)
