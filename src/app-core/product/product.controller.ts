@@ -1,5 +1,5 @@
 import { Controller, ValidationPipe, UsePipes, Res, UseGuards, HttpStatus, Get, Post, Body, Param, ParseIntPipe, Patch, Req } from '@nestjs/common'
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '../../guards/roles.guard'
 import { Roles } from '../../decorators/roles.decorator'

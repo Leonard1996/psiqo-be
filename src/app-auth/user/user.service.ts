@@ -77,10 +77,9 @@ export class UserService {
   }
 
   async updateOne(id: number, updateMeDto: UpdateMeDto | UpdateUserDto) {
-    const existingUser = await this.userRepository.findOneOrFail({ where: { id }, relations: ['patient'] })
-
+    const existingUser = await this.userRepository.createQueryBuilder('o').select('*').where('o.id = :id', { id: id }).getRawOne()
     if (updateMeDto.hasOwnProperty('newPassword')) {
-      if (existingUser.password !== crypto.createHash('sha256').update(updateMeDto.password).digest('hex'))
+      if (existingUser.password !== crypto.createHash('sha256').update(updateMeDto.oldPassword).digest('hex'))
         throw new BadRequestException('Password mismatch')
       if (updateMeDto.newPassword !== updateMeDto.confirmPassword) throw new BadRequestException('New password mismatch')
       updateMeDto.password = crypto.createHash('sha256').update(updateMeDto.newPassword).digest('hex')
@@ -240,11 +239,11 @@ export class UserService {
         lastDoneSession,
         lastOrderDone,
         totalPurchasedSessions: user.credit + doneSessions + (nextConfirmedSession ? 1 : 0),
-        totalSingleSessionsPurchased,
-        totalMultipleSessionsPurchased,
-        giftCardsPurchased,
+        totalSingleSessionsPurchased: totalSingleSessionsPurchased.amount,
+        totalMultipleSessionsPurchased: totalMultipleSessionsPurchased.amount,
+        giftCardsPurchased: giftCardsPurchased.amount,
         revenue,
-        cost,
+        cost: cost.amount,
       })
     }
     return usersReport

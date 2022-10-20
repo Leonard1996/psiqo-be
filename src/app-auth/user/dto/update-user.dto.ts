@@ -8,4 +8,5 @@ export class UpdateUserDto {
   newsletter?: boolean
   newPassword?: string
   confirmPassword?: string
+  oldPassword?: string
 }

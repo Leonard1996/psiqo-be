@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PatientDoctor } from '../../entities/patient.doctor.entity'
@@ -35,5 +35,11 @@ export class PatientDoctorService {
       .orderBy('id', 'DESC')
       .limit(1)
       .getOne()
+  }
+
+  async uploadConsent(doctorId: number, patientId: number, consent: string) {
+    const { id } = await this.patientDoctorRepository.findOneOrFail({ where: { doctorId, patientId } })
+    if (!+id) throw new BadRequestException('Incorrect Patient Doctor')
+    return this.patientDoctorRepository.update(id, { consent })
   }
 }

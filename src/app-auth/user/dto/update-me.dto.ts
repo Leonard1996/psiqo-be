@@ -31,4 +31,8 @@ export class UpdateMeDto {
   @MaxLength(20)
   @IsOptional()
   confirmPassword?: string
+  @Allow()
+  @IsString()
+  @IsOptional()
+  oldPassword?: string
 }
