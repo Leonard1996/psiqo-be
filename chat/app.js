@@ -121,11 +121,11 @@ client.on('error', (err) => console.log('Redis Client Error', err));
     console.log(`Chat server listening on port ${PORT} at ${new Date().toISOString().slice(0, 19).replace('T', ' ')}`)
   })
 
-  app.get("/history", async (request, response ) => {
+  app.get("/chat/history", async (request, response ) => {
    response.send(await client.hGet(request.query.room, 'latest')) 
   })
 
-  app.get("/test", async (request, response ) => {
+  app.get("/chat/test", async (request, response ) => {
     await client.set('test', 'it works');
     response.send(await client.get('test')) 
    })
