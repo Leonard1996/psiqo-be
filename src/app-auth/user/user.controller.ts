@@ -271,7 +271,7 @@ export class UserController {
 
   @Get('/admins')
   @UsePipes(new ValidationPipe())
-  async getAdmins(@Param('id', ParseIntPipe) id: number, @Res() response: Response, @Body() payload: any) {
+  async getAdmins(@Res() response: Response, @Body() payload: any) {
     try {
       const admins = await this.userService.listAdmins()
       return response.status(HttpStatus.OK).json({
