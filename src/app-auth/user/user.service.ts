@@ -336,4 +336,8 @@ export class UserService {
       .where(`pd.${toJoin} = :id`, { id })
       .getMany()
   }
+
+  listAdmins() {
+    return this.userRepository.find({ where: { role: 'admin' } })
+  }
 }
