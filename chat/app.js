@@ -23,7 +23,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
   let server = http.createServer(app)
   let io = socketIO(server, {
-    path:"/chat",
+    path:"/chat/socket.io/",
     transports: ['websocket'],
     cors: {
       origin: '*',
