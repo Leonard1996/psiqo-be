@@ -12,6 +12,9 @@ import { Patient } from '../../entities/patient.entity'
 import { PatientDoctor } from '../../entities/patient.doctor.entity'
 import { Session } from '../../entities/session.entity'
 import { Order } from '../../entities/order.entity'
+import { Response } from 'express'
+import { writeToPath } from '@fast-csv/format'
+const fs = require('fs')
 const crypto = require('crypto')
 
 @Injectable()
@@ -339,5 +342,21 @@ export class UserService {
 
   listAdmins() {
     return this.userRepository.find({ where: { role: 'admin' } })
+  }
+
+  generateCsv(data: any, response: Response) {
+    const path = `${__dirname}/${new Date().toISOString()}.csv`
+    const options = { headers: true, quoteColumns: false }
+
+    writeToPath(path, data, options)
+      .on('error', (error) => console.error(error))
+      .on('finish', () =>
+        response.download(path, function (error) {
+          if (error) {
+            console.log(error)
+          }
+          fs.unlinkSync(path)
+        }),
+      )
   }
 }
