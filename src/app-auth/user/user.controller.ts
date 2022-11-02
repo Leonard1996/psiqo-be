@@ -125,7 +125,7 @@ export class UserController {
   }
 
   @Get('/patients-statistics')
-  @Roles(CONSTANTS.ROLES.ADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.SUBADMIN)
   @UsePipes(new ValidationPipe())
   async getPatientsStatistics(@Req() request: Request, @Res() response: Response) {
     try {
@@ -143,7 +143,7 @@ export class UserController {
   }
 
   @Get('/patients')
-  @Roles(CONSTANTS.ROLES.ADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.SUBADMIN)
   @UsePipes(new ValidationPipe())
   async get(@Req() request: Request, @Res() response: Response) {
     try {
@@ -161,7 +161,7 @@ export class UserController {
   }
 
   @Get('/doctors')
-  @Roles(CONSTANTS.ROLES.ADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.SUBADMIN)
   @UsePipes(new ValidationPipe())
   async getDoctors(@Req() request: Request, @Res() response: Response) {
     try {
@@ -197,7 +197,7 @@ export class UserController {
   }
 
   @Get('/doctors-statistics')
-  @Roles(CONSTANTS.ROLES.ADMIN)
+  @Roles(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.SUBADMIN)
   @UsePipes(new ValidationPipe())
   async getDoctorsStatistics(@Req() request: Request, @Res() response: Response) {
     try {
@@ -209,6 +209,20 @@ export class UserController {
       })
     } catch (error) {
       console.log({ error })
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get('/doctors-statistics-csv')
+  @UsePipes(new ValidationPipe())
+  @Roles(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.SUBADMIN)
+  async getCsvPath(@Res() response: Response) {
+    try {
+      const statistics = await this.userService.getDoctorsStatistics()
+      this.userService.generateCsv(statistics, response)
+    } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({
         error,
       })
