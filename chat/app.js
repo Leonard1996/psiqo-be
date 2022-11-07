@@ -24,7 +24,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
   let server = http.createServer(app)
   let io = socketIO(server, {
     cors: {
-      origin: '*',
+      origin: 'https://aws.d2avxo3wwm519a.amplifyapp.com/my-patients',
       methods: ['GET', 'POST'],
     },
   })
