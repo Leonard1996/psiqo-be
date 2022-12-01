@@ -259,6 +259,7 @@ export class UserController {
         doctor,
       })
     } catch (error) {
+      console.log({ error })
       return response.status(error.statusCode ?? error.status ?? 400).json({
         error,
       })

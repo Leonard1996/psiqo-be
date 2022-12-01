@@ -321,6 +321,7 @@ export class UserService {
     doctor = this.userRepository.merge(doctor as any, payload) as any
     let therapist = this.therapistRepository.merge(doctor.therapist, payload)
     doctor = await this.userRepository.save(doctor)
+    console.log({ doctor })
     therapist = await this.therapistRepository.save(therapist)
     return {
       ...doctor,
