@@ -10,7 +10,7 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 5000
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
   app.setGlobalPrefix('core')
-  app.useStaticAssets(join(__dirname, '..', 'files'))
+  app.useStaticAssets(join(__dirname, '..', 'core'))
   app.use(localAuthMiddleware)
   app.enableCors()
 
