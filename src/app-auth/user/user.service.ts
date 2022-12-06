@@ -243,7 +243,7 @@ export class UserService {
 
       usersReport.push({
         ...user,
-        latestDoctor: { doctor: { ...latestDoctor } },
+        latestDoctor: { doctor: latestDoctor ? { ...latestDoctor } : null },
         doneSessions,
         doneOrders,
         nextScheduledSession,
