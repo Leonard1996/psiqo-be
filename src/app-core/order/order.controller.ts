@@ -12,7 +12,7 @@ import { CreateOrderDto } from './dto/create.order-dto'
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post(':orderId')
+  @Get(':orderId')
   @Roles(CONSTANTS.ROLES.PATIENT)
   async create(
     @Req() request: Request,
