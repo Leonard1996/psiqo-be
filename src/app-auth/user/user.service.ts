@@ -90,7 +90,7 @@ export class UserService {
     const patient = { ...existingUser.patient, details: updateMeDto.details, newsletter: updateMeDto.newsletter }
     const user = this.userRepository.merge(existingUser, updateMeDto)
     if (updateMeDto.details && updateMeDto.newsletter !== undefined) {
-      await this.patientRepository.save(patient)
+      await this.patientRepository.update({ userId: existingUser.id }, patient)
       user.patient = patient
     }
     return this.userRepository.save(user)
