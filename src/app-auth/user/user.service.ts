@@ -232,12 +232,21 @@ export class UserService {
         .where('pd.patientId = :id', { id: user.id })
         .getRawOne()
 
+      const latestDoctor = await this.userRepository
+        .createQueryBuilder('u')
+        .innerJoin('patientsDoctors', 'pd', 'pd.doctorId = u.id')
+        .innerJoin('users', 'u2', 'u2.id = pd.patientId')
+        .where('u2.id = :userId', { userId: user.id })
+        .orderBy('pd.id', 'DESC')
+        .limit(1)
+        .getOne()
+
       usersReport.push({
         ...user,
-        latestDoctor: userDoctorMap[user.id],
+        latestDoctor: { doctor: latestDoctor ? { ...latestDoctor } : null },
         doneSessions,
         doneOrders,
-        nextScheduledSession: nextScheduledSession,
+        nextScheduledSession,
         nextConfirmedSession,
         lastDoneSession,
         lastOrderDone,
@@ -321,6 +330,7 @@ export class UserService {
     doctor = this.userRepository.merge(doctor as any, payload) as any
     let therapist = this.therapistRepository.merge(doctor.therapist, payload)
     doctor = await this.userRepository.save(doctor)
+
     therapist = await this.therapistRepository.save(therapist)
     return {
       ...doctor,

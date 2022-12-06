@@ -73,7 +73,7 @@ export class AuthController {
       const { id } = await this.authService.register(registerDto, true)
       delete request.body.password
       delete request.body.confirmPassword
-      await this.userService.registerTherapist({ userId: id, details: request.body, cv: cv.path })
+      await this.userService.registerTherapist({ userId: id, details: request.body, cv: cv.path, rate: 0.0 })
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Your application has been submitted',

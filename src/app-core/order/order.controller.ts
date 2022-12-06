@@ -12,7 +12,24 @@ import { CreateOrderDto } from './dto/create.order-dto'
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post(':orderId')
+  @Get('/all')
+  @Roles(CONSTANTS.ROLES.ADMIN)
+  async getOrders(@Req() request: Request, @Res() response: Response) {
+    try {
+      const orders = await this.orderService.getOrders()
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        orders,
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Get(':orderId')
   @Roles(CONSTANTS.ROLES.PATIENT)
   async create(
     @Req() request: Request,
@@ -48,23 +65,6 @@ export class OrderController {
   async getByUserId(@Req() request: Request, @Res() response: Response, @Query('id') id?: number) {
     try {
       const orders = await this.orderService.getByUserId(id ?? request['user']['id'])
-      return response.status(HttpStatus.OK).json({
-        statusCode: HttpStatus.OK,
-        message: 'Consent updated successfully',
-        orders,
-      })
-    } catch (error) {
-      return response.status(error.statusCode ?? error.status ?? 400).json({
-        error,
-      })
-    }
-  }
-
-  @Get('/all')
-  @Roles(CONSTANTS.ROLES.ADMIN)
-  async getOrders(@Req() request: Request, @Res() response: Response) {
-    try {
-      const orders = await this.orderService.getOrders()
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Consent updated successfully',
