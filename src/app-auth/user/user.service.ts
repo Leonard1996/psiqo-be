@@ -232,12 +232,21 @@ export class UserService {
         .where('pd.patientId = :id', { id: user.id })
         .getRawOne()
 
+      const latestDoctor = await this.userRepository
+        .createQueryBuilder('u')
+        .innerJoin('patientsDoctors', 'pd', 'pd.doctorId = u.id')
+        .innerJoin('users', 'u2', 'u2.id = pd.patientId')
+        .where('u2.id = :userId', { userId: user.id })
+        .orderBy('pd.id', 'DESC')
+        .limit(1)
+        .getOne()
+
       usersReport.push({
         ...user,
-        latestDoctor: userDoctorMap[user.id],
+        latestDoctor,
         doneSessions,
         doneOrders,
-        nextScheduledSession: nextScheduledSession,
+        nextScheduledSession,
         nextConfirmedSession,
         lastDoneSession,
         lastOrderDone,
