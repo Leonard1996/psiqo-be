@@ -29,7 +29,6 @@ client.on('error', (err) => console.log('Redis Client Error', err))
   })
 
   io.on('connection', (socket) => {
-    // console.log('New user connected')
     const token = socket.handshake.headers.authorization
 
     socket.on('requestHistory', async function (receiver) {
