@@ -8,10 +8,11 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import global from '../../global/file-config'
 import { UserService } from '../user/user.service'
 import { ROLES } from '../common/constants'
+import { MailService } from 'src/app-core/mail/services/mail.service'
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
+  constructor(private readonly authService: AuthService, private readonly userService: UserService, private readonly mailService: MailService) {}
 
   @Post('/login')
   @UsePipes(new ValidationPipe())
@@ -77,6 +78,39 @@ export class AuthController {
       return response.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Your application has been submitted',
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Post('/reset-code')
+  @UsePipes(new ValidationPipe())
+  async getResetCode(@Res() response: Response, @Body() payload: any, @Req() request: Request) {
+    try {
+      const resetPasswordCode = await this.userService.getResetCode(payload.email)
+      this.mailService.sendPasswordResetCode(payload.email, resetPasswordCode)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+      })
+    } catch (error) {
+      return response.status(error.statusCode ?? error.status ?? 400).json({
+        error,
+      })
+    }
+  }
+
+  @Post('/reset-password')
+  @UsePipes(new ValidationPipe())
+  async getResetPassword(@Res() response: Response, @Body() payload: any, @Req() request: Request) {
+    try {
+      await this.userService.resetPassword(payload)
+      return response.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Success',
       })
     } catch (error) {
       return response.status(error.statusCode ?? error.status ?? 400).json({

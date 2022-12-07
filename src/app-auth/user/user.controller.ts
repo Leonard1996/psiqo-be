@@ -8,11 +8,12 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { Roles } from '../../decorators/roles.decorator'
 import { CONSTANTS } from '../common/constants'
 import { join } from 'path'
+import { MailService } from 'src/app-core/mail/services/mail.service'
 
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly mailerService: MailService) {}
 
   @Get('me')
   @UsePipes(new ValidationPipe())

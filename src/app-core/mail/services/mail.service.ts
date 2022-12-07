@@ -110,4 +110,18 @@ export class MailService {
     })
     Promise.allSettled(mailQueries)
   }
+
+  async sendPasswordResetCode(email: string, code: string) {
+    const url = `${this.configService.get('FRONTEND_URL')}/reset-password`
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Psiqo reset password code`,
+      template: 'reset-password-code',
+      context: {
+        url,
+        code,
+      },
+    })
+  }
 }

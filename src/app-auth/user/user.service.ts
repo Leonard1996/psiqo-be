@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common'
+import { BadRequestException, ConflictException, Injectable, PayloadTooLargeException } from '@nestjs/common'
 import { Not, Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from '../../entities/user.entity'
@@ -368,5 +368,31 @@ export class UserService {
           fs.unlinkSync(path)
         }),
       )
+  }
+
+  async getResetCode(email: string) {
+    const resetPasswordCode = crypto.randomUUID()
+    await this.userRepository.update(
+      { email },
+      {
+        resetPasswordCode,
+      },
+    )
+    return resetPasswordCode
+  }
+
+  resetPassword(payload: any) {
+    if (payload.password !== payload.confirmPassword) throw Error('Password mismatch')
+    const password = crypto.createHash('sha256').update(payload.password).digest('hex')
+
+    return this.userRepository.update(
+      {
+        email: payload.email,
+        resetPasswordCode: payload.resetPasswordCode,
+      },
+      {
+        password,
+      },
+    )
   }
 }

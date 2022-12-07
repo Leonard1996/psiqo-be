@@ -46,6 +46,9 @@ export class User extends BasicEntity {
   @Column({ type: 'tinyint', nullable: true })
   isSingle: boolean
 
+  @Column({ type: 'varchar', nullable: true })
+  resetPasswordCode: string
+
   @Column({ type: 'int', default: 1 })
   credit: number
 
