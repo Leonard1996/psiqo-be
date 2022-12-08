@@ -8,7 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import global from '../../global/file-config'
 import { UserService } from '../user/user.service'
 import { ROLES } from '../common/constants'
-import { MailService } from 'src/app-core/mail/services/mail.service'
+import { MailService } from '../../../src/app-core/mail/services/mail.service'
 
 @Controller()
 export class AuthController {
